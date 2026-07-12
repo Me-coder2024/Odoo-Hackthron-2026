@@ -3,7 +3,17 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/hooks/useAuth';
-import { Icon } from '@iconify/react';
+import {
+  LayoutDashboard,
+  Truck,
+  Route,
+  Users,
+  Wrench,
+  Fuel,
+  BarChart3,
+  Settings,
+  LogOut,
+} from 'lucide-react';
 
 interface NavItem {
   label: string;
@@ -16,49 +26,49 @@ const NAV_ITEMS: NavItem[] = [
   {
     label: 'Dashboard',
     href: '/dashboard',
-    icon: <Icon icon="mdi:view-dashboard" width="18" height="18" />,
+    icon: <LayoutDashboard size={18} />,
     roles: ['FLEET_MANAGER', 'DISPATCHER', 'SAFETY_OFFICER', 'FINANCIAL_ANALYST'],
   },
   {
     label: 'Fleet',
     href: '/vehicles',
-    icon: <Icon icon="mdi:truck" width="18" height="18" />,
+    icon: <Truck size={18} />,
     roles: ['FLEET_MANAGER', 'DISPATCHER', 'SAFETY_OFFICER', 'FINANCIAL_ANALYST'],
   },
   {
     label: 'Drivers',
     href: '/drivers',
-    icon: <Icon icon="mdi:account-group" width="18" height="18" />,
+    icon: <Users size={18} />,
     roles: ['FLEET_MANAGER', 'SAFETY_OFFICER', 'DISPATCHER'],
   },
   {
     label: 'Trips',
     href: '/trips',
-    icon: <Icon icon="mdi:map-marker-distance" width="18" height="18" />,
+    icon: <Route size={18} />,
     roles: ['FLEET_MANAGER', 'DISPATCHER', 'SAFETY_OFFICER', 'FINANCIAL_ANALYST'],
   },
   {
     label: 'Maintenance',
     href: '/maintenance',
-    icon: <Icon icon="mdi:wrench" width="18" height="18" />,
+    icon: <Wrench size={18} />,
     roles: ['FLEET_MANAGER', 'SAFETY_OFFICER'],
   },
   {
     label: 'Fuel & Expenses',
     href: '/fuel-expenses',
-    icon: <Icon icon="mdi:gas-station" width="18" height="18" />,
+    icon: <Fuel size={18} />,
     roles: ['FLEET_MANAGER', 'FINANCIAL_ANALYST', 'DISPATCHER'],
   },
   {
     label: 'Analytics',
     href: '/analytics',
-    icon: <Icon icon="mdi:chart-bar" width="18" height="18" />,
+    icon: <BarChart3 size={18} />,
     roles: ['FLEET_MANAGER', 'FINANCIAL_ANALYST', 'DISPATCHER', 'SAFETY_OFFICER'],
   },
   {
     label: 'Settings',
     href: '/settings',
-    icon: <Icon icon="mdi:cog" width="18" height="18" />,
+    icon: <Settings size={18} />,
     roles: ['FLEET_MANAGER'],
   },
 ];
@@ -88,12 +98,8 @@ export function Sidebar() {
       {/* Brand */}
       <div
         style={{
-          height: 60,
-          padding: '0 20px',
+          padding: '20px 20px 16px',
           borderBottom: '1px solid rgba(255,255,255,0.1)',
-          display: 'flex',
-          alignItems: 'center',
-          flexShrink: 0,
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -102,13 +108,13 @@ export function Sidebar() {
               width: 28,
               height: 28,
               borderRadius: 6,
-              backgroundColor: '#FFFFFF',
+              backgroundColor: '#E67E00',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <Icon icon="mdi:truck" width="16" height="16" color="#1542C2" />
+            <Truck size={15} color="#fff" />
           </div>
           <span style={{ fontSize: 16, fontWeight: 700, color: '#FFFFFF', letterSpacing: '-0.01em' }}>
             TransitOps
@@ -136,7 +142,7 @@ export function Sidebar() {
                 backgroundColor: isActive ? 'rgba(255,255,255,0.15)' : 'transparent',
                 textDecoration: 'none',
                 transition: 'all 0.15s ease',
-                borderLeft: isActive ? '3px solid #FFFFFF' : '3px solid transparent',
+                borderLeft: isActive ? '3px solid #E67E00' : '3px solid transparent',
               }}
               onMouseEnter={(e) => {
                 if (!isActive) {
@@ -185,7 +191,7 @@ export function Sidebar() {
             (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.75)';
           }}
         >
-          <Icon icon="mdi:logout" width="18" height="18" />
+          <LogOut size={18} />
           <span>Logout</span>
         </button>
       </div>

@@ -3,22 +3,24 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import api from '@/lib/api';
-import { Plus, Search, Route } from 'lucide-react';
+import { Route } from 'lucide-react';
 
 const STATUS_BG: Record<string, string> = {
   DRAFT: '#4B5563',
-  DISPATCHED: '#D97706',
+  DISPATCHED: '#3B82F6',
   COMPLETED: '#059669',
   CANCELLED: '#DC2626',
 };
 
+const LIFECYCLE_STEPS = ['Draft', 'Dispatched', 'Completed'];
+
 function StatusBadge({ status }: { status: string }) {
   const bg = STATUS_BG[status] || '#374151';
-  const label = status === 'DISPATCHED' ? 'Dispatched' : status.charAt(0) + status.slice(1).toLowerCase();
+  const label = status.charAt(0) + status.slice(1).toLowerCase();
   return (
     <span style={{
-      display: 'inline-block', padding: '4px 14px', borderRadius: 4, fontSize: 12, fontWeight: 600,
-      color: '#fff', backgroundColor: bg, minWidth: 80, textAlign: 'center',
+      display: 'inline-block', padding: '4px 16px', borderRadius: 4, fontSize: 12, fontWeight: 600,
+      color: '#fff', backgroundColor: bg,
     }}>
       {label}
     </span>
@@ -28,26 +30,19 @@ function StatusBadge({ status }: { status: string }) {
 export default function TripsPage() {
   const [trips, setTrips] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
-  const [showForm, setShowForm] = useState(false);
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [drivers, setDrivers] = useState<any[]>([]);
   const [formData, setFormData] = useState({ source: '', destination: '', vehicle_id: '', driver_id: '', cargo_weight: '', planned_distance: '' });
   const [formError, setFormError] = useState('');
+  const [showForm, setShowForm] = useState(true);
 
   const fetchTrips = async () => {
     try {
-      const params: Record<string, string> = {};
-      if (search) params.search = search;
-      if (statusFilter) params.status = statusFilter;
-      const res = await api.get('/trips', { params });
+      const res = await api.get('/trips');
       setTrips(res.data.data);
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
   };
-
-  useEffect(() => { fetchTrips(); }, [search, statusFilter]);
 
   const loadFormData = async () => {
     try {
@@ -56,6 +51,8 @@ export default function TripsPage() {
       setDrivers(dRes.data.data);
     } catch (err) { console.error(err); }
   };
+
+  useEffect(() => { fetchTrips(); loadFormData(); }, []);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,7 +63,6 @@ export default function TripsPage() {
         cargo_weight: parseFloat(formData.cargo_weight),
         planned_distance: parseFloat(formData.planned_distance),
       });
-      setShowForm(false);
       setFormData({ source: '', destination: '', vehicle_id: '', driver_id: '', cargo_weight: '', planned_distance: '' });
       fetchTrips();
     } catch (err: unknown) {
@@ -81,111 +77,140 @@ export default function TripsPage() {
 
   const selectedVehicle = vehicles.find(v => v.id === formData.vehicle_id);
   const cargoExceeds = selectedVehicle && formData.cargo_weight && parseFloat(formData.cargo_weight) > Number(selectedVehicle.max_load_capacity);
+  const exceededBy = cargoExceeds ? parseFloat(formData.cargo_weight) - Number(selectedVehicle.max_load_capacity) : 0;
 
-  const inputStyle = { width: '100%', padding: '10px 14px', backgroundColor: '#1A1D26', border: '1px solid #2A2D38', borderRadius: 6, color: '#E5E7EB', fontSize: 14, outline: 'none', marginTop: 4 };
-  const labelStyle = { fontSize: 11, color: '#6B7280', textTransform: 'uppercase' as const, letterSpacing: '0.05em', fontWeight: 600 };
+  const inputStyle: React.CSSProperties = { width: '100%', padding: '10px 14px', backgroundColor: '#FFFFFF', border: '1px solid #D1D5DB', borderRadius: 6, color: '#111827', fontSize: 14, outline: 'none', marginTop: 4 };
+  const labelStyle: React.CSSProperties = { fontSize: 10, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600, marginBottom: 2 };
 
   return (
-    <div>
-      {/* Filters + New Trip */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <div style={{ display: 'flex', gap: 10 }}>
-          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ padding: '7px 14px', backgroundColor: '#111420', border: '1px solid #1E2130', borderRadius: 6, color: '#9CA3AF', fontSize: 13 }}>
-            <option value="">Status: All</option>
-            <option value="DRAFT">Draft</option>
-            <option value="DISPATCHED">Dispatched</option>
-            <option value="COMPLETED">Completed</option>
-            <option value="CANCELLED">Cancelled</option>
-          </select>
-          <div style={{ position: 'relative' }}>
-            <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#4B5563' }} />
-            <input placeholder="Search trips..." value={search} onChange={e => setSearch(e.target.value)} style={{ ...inputStyle, paddingLeft: 32, width: 200, marginTop: 0 }} />
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+      {/* LEFT — Trip Lifecycle + Create Form */}
+      <div>
+        {/* Trip Lifecycle Stepper */}
+        <div style={{ marginBottom: 24 }}>
+          <div style={{ fontSize: 10, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>TRIP LIFECYCLE</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
+            {LIFECYCLE_STEPS.map((step, i) => {
+              const isActive = i <= 1;
+              const color = isActive ? (i === 0 ? '#10B981' : '#3B82F6') : '#E5E7EB';
+              return (
+                <div key={step} style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                    <div style={{ width: 16, height: 16, borderRadius: '50%', backgroundColor: color, border: `2px solid ${color}` }} />
+                    <span style={{ fontSize: 11, color: isActive ? '#111827' : '#9CA3AF', fontWeight: isActive ? 600 : 400 }}>{step}</span>
+                  </div>
+                  {i < LIFECYCLE_STEPS.length - 1 && (
+                    <div style={{ flex: 1, height: 2, backgroundColor: i < 1 ? '#3B82F6' : '#E5E7EB', marginBottom: 18 }} />
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
-        <button onClick={() => { setShowForm(!showForm); if (!showForm) loadFormData(); }} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 18px', backgroundColor: '#E67E00', color: '#fff', border: 'none', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
-          <Plus size={16} /> New Trip
-        </button>
-      </div>
 
-      {/* Create Form */}
-      {showForm && (
-        <div style={{ backgroundColor: '#111420', border: '1px solid #1E2130', borderRadius: 8, padding: 24, marginBottom: 20 }}>
-          <h3 style={{ fontSize: 15, fontWeight: 500, marginBottom: 16, color: '#E5E7EB' }}>Create Trip</h3>
-          {formError && <div style={{ color: '#F87171', fontSize: 13, marginBottom: 12, padding: '8px 12px', backgroundColor: 'rgba(239,68,68,0.1)', borderRadius: 6 }}>{formError}</div>}
-          <form onSubmit={handleCreate} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14 }}>
-            <div><label style={labelStyle}>Source</label><input value={formData.source} onChange={e => setFormData({...formData, source: e.target.value})} required style={inputStyle} placeholder="City A" /></div>
-            <div><label style={labelStyle}>Destination</label><input value={formData.destination} onChange={e => setFormData({...formData, destination: e.target.value})} required style={inputStyle} placeholder="City B" /></div>
+        {/* Create Trip Form */}
+        <div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: '#4B5563', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 16 }}>CREATE TRIP</div>
+          <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             <div>
-              <label style={labelStyle}>Vehicle (Available only)</label>
+              <label style={labelStyle}>SOURCE</label>
+              <input value={formData.source} onChange={e => setFormData({...formData, source: e.target.value})} required style={inputStyle} placeholder="Gandhinagar Depot" />
+            </div>
+            <div>
+              <label style={labelStyle}>DESTINATION</label>
+              <input value={formData.destination} onChange={e => setFormData({...formData, destination: e.target.value})} required style={inputStyle} placeholder="Ahmedabad Hub" />
+            </div>
+            <div>
+              <label style={labelStyle}>VEHICLE (AVAILABLE ONLY)</label>
               <select value={formData.vehicle_id} onChange={e => setFormData({...formData, vehicle_id: e.target.value})} required style={inputStyle}>
                 <option value="">Select vehicle</option>
-                {vehicles.map(v => <option key={v.id} value={v.id}>{v.name} — {v.registration_number} (Max: {Number(v.max_load_capacity).toLocaleString()} kg)</option>)}
+                {vehicles.map(v => <option key={v.id} value={v.id}>{v.registration_number} — {Number(v.max_load_capacity).toLocaleString()} kg capacity</option>)}
               </select>
             </div>
             <div>
-              <label style={labelStyle}>Driver (Valid License)</label>
+              <label style={labelStyle}>DRIVER (AVAILABLE ONLY)</label>
               <select value={formData.driver_id} onChange={e => setFormData({...formData, driver_id: e.target.value})} required style={inputStyle}>
                 <option value="">Select driver</option>
-                {drivers.map(d => <option key={d.id} value={d.id}>{d.name} — Score: {d.safety_score}</option>)}
+                {drivers.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
               </select>
             </div>
             <div>
-              <label style={labelStyle}>Cargo Weight (kg)</label>
+              <label style={labelStyle}>CARGO WEIGHT (KG)</label>
               <input type="number" value={formData.cargo_weight} onChange={e => setFormData({...formData, cargo_weight: e.target.value})} required style={inputStyle} />
-              {selectedVehicle && <div style={{ fontSize: 11, color: '#6B7280', marginTop: 4 }}>Remaining: {(Number(selectedVehicle.max_load_capacity) - (parseFloat(formData.cargo_weight) || 0)).toLocaleString()} kg</div>}
-              {cargoExceeds && <div style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>⚠ Exceeds max capacity of {Number(selectedVehicle.max_load_capacity).toLocaleString()} kg</div>}
             </div>
-            <div><label style={labelStyle}>Planned Distance (km)</label><input type="number" value={formData.planned_distance} onChange={e => setFormData({...formData, planned_distance: e.target.value})} required style={inputStyle} /></div>
-            <div style={{ gridColumn: 'span 3', display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 8 }}>
-              <button type="button" onClick={() => setShowForm(false)} style={{ padding: '8px 16px', backgroundColor: '#1A1D26', color: '#9CA3AF', border: '1px solid #2A2D38', borderRadius: 6, cursor: 'pointer', fontSize: 13 }}>Cancel</button>
-              <button type="submit" disabled={!!cargoExceeds} style={{ padding: '8px 16px', backgroundColor: cargoExceeds ? '#374151' : '#E67E00', color: '#fff', border: 'none', borderRadius: 6, cursor: cargoExceeds ? 'not-allowed' : 'pointer', fontSize: 13, fontWeight: 600 }}>Create Trip</button>
+            <div>
+              <label style={labelStyle}>PLANNED DISTANCE (KM)</label>
+              <input type="number" value={formData.planned_distance} onChange={e => setFormData({...formData, planned_distance: e.target.value})} required style={inputStyle} />
+            </div>
+
+            {/* Capacity Warning */}
+            {cargoExceeds && (
+              <div style={{ backgroundColor: 'rgba(220,38,38,0.06)', border: '1px solid rgba(220,38,38,0.2)', borderRadius: 6, padding: '10px 14px', marginTop: 4 }}>
+                <div style={{ fontSize: 12, color: '#DC2626' }}>Vehicle Capacity: {Number(selectedVehicle.max_load_capacity).toLocaleString()} kg</div>
+                <div style={{ fontSize: 12, color: '#DC2626' }}>Cargo Weight: {parseFloat(formData.cargo_weight).toLocaleString()} kg</div>
+                <div style={{ fontSize: 12, color: '#EF4444', fontWeight: 600, marginTop: 4 }}>✕ Capacity exceeded by {exceededBy.toLocaleString()} kg — dispatch blocked</div>
+              </div>
+            )}
+
+            {formError && <div style={{ color: '#DC2626', fontSize: 13, padding: '8px 12px', backgroundColor: 'rgba(239,68,68,0.06)', borderRadius: 6 }}>{formError}</div>}
+
+            <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
+              <button type="submit" disabled={!!cargoExceeds} style={{
+                flex: 1, padding: '10px 16px', backgroundColor: cargoExceeds ? '#E5E7EB' : '#E67E00',
+                color: cargoExceeds ? '#9CA3AF' : '#fff', border: '1px solid #D1D5DB', borderRadius: 6,
+                fontSize: 13, fontWeight: 600, cursor: cargoExceeds ? 'not-allowed' : 'pointer',
+              }}>
+                {cargoExceeds ? 'Dispatch (disabled)' : 'Create & Dispatch'}
+              </button>
+              <button type="button" onClick={() => setFormData({ source: '', destination: '', vehicle_id: '', driver_id: '', cargo_weight: '', planned_distance: '' })} style={{
+                padding: '10px 24px', backgroundColor: '#FFFFFF', color: '#E67E00',
+                border: '1px solid #E67E00', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer',
+              }}>
+                Cancel
+              </button>
             </div>
           </form>
         </div>
-      )}
-
-      {/* Table */}
-      <div style={{ backgroundColor: '#111420', border: '1px solid #1E2130', borderRadius: 8, overflow: 'hidden' }}>
-        {loading ? (
-          <div style={{ padding: 20 }}>{[1,2,3,4].map(i => <div key={i} className="skeleton" style={{ height: 44, marginBottom: 6, borderRadius: 4 }} />)}</div>
-        ) : trips.length === 0 ? (
-          <div style={{ padding: 60, textAlign: 'center' }}><Route size={36} style={{ color: '#374151', marginBottom: 10 }} /><p style={{ color: '#4B5563', fontSize: 13 }}>No trips found</p></div>
-        ) : (
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid #1E2130' }}>
-                {['TRIP #', 'ROUTE', 'VEHICLE', 'DRIVER', 'CARGO', 'STATUS', 'REVENUE', 'ACTION'].map(h => (
-                  <th key={h} style={{ padding: '10px 14px', fontSize: 10, fontWeight: 600, color: '#4B5563', textTransform: 'uppercase', textAlign: 'left', letterSpacing: '0.06em' }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {trips.map(t => (
-                <tr key={t.id} style={{ borderBottom: '1px solid #1A1D26' }}>
-                  <td style={{ padding: '10px 14px', fontSize: 13, fontFamily: 'monospace' }}>
-                    <Link href={`/trips/${t.id}`} style={{ color: '#E5E7EB', textDecoration: 'none' }}>{t.trip_number}</Link>
-                  </td>
-                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#9CA3AF' }}>{t.source} → {t.destination}</td>
-                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#9CA3AF' }}>{t.vehicle?.name || '—'}</td>
-                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#9CA3AF' }}>{t.driver?.name || '—'}</td>
-                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#9CA3AF' }}>{Number(t.cargo_weight).toLocaleString()} kg</td>
-                  <td style={{ padding: '10px 14px' }}><StatusBadge status={t.status} /></td>
-                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#9CA3AF' }}>{t.revenue ? `₹${Number(t.revenue).toLocaleString()}` : '—'}</td>
-                  <td style={{ padding: '10px 14px' }}>
-                    {t.status === 'DRAFT' && (
-                      <button onClick={() => handleDispatch(t.id)} style={{ padding: '4px 12px', backgroundColor: '#E67E00', color: '#fff', border: 'none', borderRadius: 4, fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>Dispatch</button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
       </div>
 
-      <p style={{ marginTop: 16, fontSize: 12, color: '#E67E00', fontStyle: 'italic' }}>
-        Only AVAILABLE vehicles & drivers with valid licenses appear in dispatch form
-      </p>
+      {/* RIGHT — Live Board */}
+      <div>
+        <div style={{ fontSize: 13, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 16 }}>LIVE BOARD</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {loading ? (
+            [1,2,3].map(i => <div key={i} className="skeleton" style={{ height: 90, borderRadius: 8 }} />)
+          ) : trips.length === 0 ? (
+            <div style={{ padding: 40, textAlign: 'center', color: '#6B7280', fontSize: 13 }}>
+              <Route size={28} style={{ color: '#D1D5DB', marginBottom: 8 }} />
+              <p>No trips yet</p>
+            </div>
+          ) : (
+            trips.slice(0, 8).map(t => (
+              <div key={t.id} style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 8, padding: '14px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: '#111827', fontFamily: 'monospace' }}>{t.trip_number}</span>
+                  <span style={{ fontSize: 12, color: '#6B7280' }}>{t.vehicle?.registration_number || '—'} / {t.driver?.name?.split(' ')[0] || '—'}</span>
+                </div>
+                <div style={{ fontSize: 13, color: '#4B5563', marginBottom: 8 }}>{t.source} → {t.destination}</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <StatusBadge status={t.status} />
+                  <span style={{ fontSize: 12, color: '#6B7280' }}>
+                    {t.status === 'DISPATCHED' ? '~45 min' :
+                     t.status === 'DRAFT' ? 'Awaiting driver' :
+                     t.status === 'CANCELLED' ? 'Vehicle went to shop' : '—'}
+                  </span>
+                </div>
+                {t.status === 'DRAFT' && (
+                  <button onClick={() => handleDispatch(t.id)} style={{ marginTop: 8, padding: '5px 14px', backgroundColor: '#3B82F6', color: '#fff', border: 'none', borderRadius: 4, fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>Dispatch Now</button>
+                )}
+              </div>
+            ))
+          )}
+        </div>
+        <p style={{ marginTop: 16, fontSize: 11, color: '#6B7280', fontStyle: 'italic' }}>
+          On complete: odometer → fuel log → expenses → Vehicle & Driver Available
+        </p>
+      </div>
     </div>
   );
 }

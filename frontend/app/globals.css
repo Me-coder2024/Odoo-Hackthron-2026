@@ -1,26 +1,29 @@
 @import "tailwindcss";
 
 @theme {
-  /* Dark theme — matches mockup exactly */
-  --color-bg-primary: #111420;
-  --color-bg-surface: #1A1D26;
-  --color-bg-elevated: #2A2D38;
-  --color-bg-page: #0B0E14;
+  /* Light theme — Blue sidebar + White content */
+  --color-bg-primary: #FFFFFF;
+  --color-bg-surface: #F3F4F6;
+  --color-bg-elevated: #E5E7EB;
+  --color-bg-page: #FFFFFF;
 
   /* Text */
-  --color-text-primary: #E5E7EB;
-  --color-text-secondary: #9CA3AF;
-  --color-text-muted: #6B7280;
+  --color-text-primary: #111827;
+  --color-text-secondary: #4B5563;
+  --color-text-muted: #9CA3AF;
 
   /* Borders */
-  --color-border-default: #1E2130;
-  --color-border-subtle: #1A1D26;
+  --color-border-default: #E5E7EB;
+  --color-border-subtle: #F3F4F6;
 
   /* Accent — Orange #E67E00 */
   --color-accent: #E67E00;
   --color-accent-hover: #CC6F00;
   --color-accent-light: #FFF3E0;
   --color-accent-muted: rgba(230, 126, 0, 0.15);
+
+  /* Sidebar */
+  --color-sidebar: #1542C2;
 
   /* Status badge colors */
   --color-status-available: #10B981;
@@ -36,7 +39,7 @@
 }
 
 html {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
@@ -55,16 +58,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-bg-primary);
+  background: #F3F4F6;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-bg-elevated);
+  background: #D1D5DB;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: #9CA3AF;
 }
 
 /* Focus ring */
@@ -83,9 +86,9 @@ body {
 .skeleton {
   background: linear-gradient(
     90deg,
-    #1A1D26 25%,
-    #2A2D38 50%,
-    #1A1D26 75%
+    #E5E7EB 25%,
+    #F3F4F6 50%,
+    #E5E7EB 75%
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
@@ -104,20 +107,20 @@ th {
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #4B5563;
+  color: #6B7280;
   padding: 10px 14px;
-  border-bottom: 1px solid #1E2130;
+  border-bottom: 1px solid #E5E7EB;
 }
 
 td {
   padding: 10px 14px;
   font-size: 13px;
-  border-bottom: 1px solid #1A1D26;
-  color: #E5E7EB;
+  border-bottom: 1px solid #F3F4F6;
+  color: #111827;
 }
 
 tr:hover td {
-  background-color: rgba(255, 255, 255, 0.02);
+  background-color: rgba(21, 66, 194, 0.02);
 }
 
 /* Form inputs */
@@ -132,9 +135,9 @@ input[type="number"],
 input[type="date"],
 select,
 textarea {
-  background-color: #1A1D26;
-  border: 1px solid #2A2D38;
-  color: #E5E7EB;
+  background-color: #FFFFFF;
+  border: 1px solid #D1D5DB;
+  color: #111827;
   padding: 10px 14px;
   border-radius: 6px;
   font-size: 14px;
@@ -145,14 +148,14 @@ textarea {
 input:focus,
 select:focus,
 textarea:focus {
-  border-color: var(--color-accent);
+  border-color: #1542C2;
   outline: none;
-  box-shadow: 0 0 0 3px var(--color-accent-muted);
+  box-shadow: 0 0 0 3px rgba(21, 66, 194, 0.12);
 }
 
 input::placeholder,
 textarea::placeholder {
-  color: #4B5563;
+  color: #9CA3AF;
 }
 
 input:disabled,
@@ -160,6 +163,7 @@ select:disabled,
 textarea:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  background-color: #F3F4F6;
 }
 
 /* Labels */

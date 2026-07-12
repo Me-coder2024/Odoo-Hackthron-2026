@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/hooks/useAuth';
 import { Sidebar } from '@/components/shared/Sidebar';
-import { Icon } from '@iconify/react';
+import { Search } from 'lucide-react';
 
 const ROLE_LABELS: Record<string, string> = {
   FLEET_MANAGER: 'Fleet Mgr',
@@ -14,7 +14,7 @@ const ROLE_LABELS: Record<string, string> = {
 };
 
 const ROLE_BADGE_COLORS: Record<string, string> = {
-  FLEET_MANAGER: '#1542C2',
+  FLEET_MANAGER: '#E67E00',
   DISPATCHER: '#3B82F6',
   SAFETY_OFFICER: '#10B981',
   FINANCIAL_ANALYST: '#8B5CF6',
@@ -88,7 +88,7 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
         {/* Top Header Bar */}
         <header
           style={{
-            height: 60,
+            height: 52,
             backgroundColor: '#FFFFFF',
             borderBottom: '1px solid #E5E7EB',
             display: 'flex',
@@ -100,7 +100,7 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
         >
           {/* Search */}
           <div style={{ position: 'relative', width: 240 }}>
-            <Icon icon="mdi:magnify" width="14" height="14" style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
+            <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
             <input
               placeholder="Search..."
               style={{

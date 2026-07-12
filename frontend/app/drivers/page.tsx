@@ -39,7 +39,7 @@ function SafetyBar({ score }: { score: number }) {
   const color = score >= 80 ? '#10B981' : score >= 60 ? '#F59E0B' : '#EF4444';
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-      <div style={{ flex: 1, height: 6, backgroundColor: '#1A1D26', borderRadius: 3, overflow: 'hidden', maxWidth: 60 }}>
+      <div style={{ flex: 1, height: 6, backgroundColor: '#F3F4F6', borderRadius: 3, overflow: 'hidden', maxWidth: 60 }}>
         <div style={{ width: `${score}%`, height: '100%', backgroundColor: color, borderRadius: 3 }} />
       </div>
       <span style={{ fontSize: 12, color, fontWeight: 600 }}>{score}</span>
@@ -89,7 +89,7 @@ export default function DriversPage() {
       {/* Filters + Add */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <div style={{ display: 'flex', gap: 10 }}>
-          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ padding: '7px 14px', backgroundColor: '#111420', border: '1px solid #1E2130', borderRadius: 6, color: '#9CA3AF', fontSize: 13 }}>
+          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ padding: '7px 14px', backgroundColor: '#FFFFFF', border: '1px solid #D1D5DB', borderRadius: 6, color: '#4B5563', fontSize: 13 }}>
             <option value="">Status: All</option>
             <option value="ACTIVE">Active</option>
             <option value="ON_TRIP">On Trip</option>
@@ -97,8 +97,8 @@ export default function DriversPage() {
             <option value="OFF_DUTY">Off Duty</option>
           </select>
           <div style={{ position: 'relative' }}>
-            <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#4B5563' }} />
-            <input placeholder="Search driver..." value={search} onChange={e => setSearch(e.target.value)} style={{ padding: '7px 10px 7px 32px', backgroundColor: '#111420', border: '1px solid #1E2130', borderRadius: 6, color: '#9CA3AF', fontSize: 13, width: 200, outline: 'none' }} />
+            <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
+            <input placeholder="Search driver..." value={search} onChange={e => setSearch(e.target.value)} style={{ padding: '7px 10px 7px 32px', backgroundColor: '#FFFFFF', border: '1px solid #D1D5DB', borderRadius: 6, color: '#111827', fontSize: 13, width: 200, outline: 'none' }} />
           </div>
         </div>
         <button onClick={() => setShowForm(!showForm)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 18px', backgroundColor: '#10B981', color: '#fff', border: 'none', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
@@ -108,16 +108,16 @@ export default function DriversPage() {
 
       {/* Create Form */}
       {showForm && (
-        <div style={{ backgroundColor: '#111420', border: '1px solid #1E2130', borderRadius: 8, padding: 24, marginBottom: 20 }}>
-          <h3 style={{ fontSize: 15, fontWeight: 500, marginBottom: 16, color: '#E5E7EB' }}>New Driver</h3>
-          {formError && <div style={{ color: '#F87171', fontSize: 13, marginBottom: 12, padding: '8px 12px', backgroundColor: 'rgba(239,68,68,0.1)', borderRadius: 6 }}>{formError}</div>}
+        <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 8, padding: 24, marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
+          <h3 style={{ fontSize: 15, fontWeight: 500, marginBottom: 16, color: '#111827' }}>New Driver</h3>
+          {formError && <div style={{ color: '#DC2626', fontSize: 13, marginBottom: 12, padding: '8px 12px', backgroundColor: 'rgba(239,68,68,0.06)', borderRadius: 6 }}>{formError}</div>}
           <form onSubmit={handleCreate} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
             <div><label style={{ fontSize: 11, color: '#6B7280', textTransform: 'uppercase' }}>Name</label><input value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required style={{ marginTop: 4 }} /></div>
             <div><label style={{ fontSize: 11, color: '#6B7280', textTransform: 'uppercase' }}>License Number</label><input value={formData.license_number} onChange={e => setFormData({...formData, license_number: e.target.value})} required style={{ marginTop: 4 }} /></div>
             <div><label style={{ fontSize: 11, color: '#6B7280', textTransform: 'uppercase' }}>License Expiry</label><input type="date" value={formData.license_expiry} onChange={e => setFormData({...formData, license_expiry: e.target.value})} required style={{ marginTop: 4 }} /></div>
             <div><label style={{ fontSize: 11, color: '#6B7280', textTransform: 'uppercase' }}>Phone</label><input value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} required style={{ marginTop: 4 }} /></div>
             <div style={{ gridColumn: 'span 2', display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 8 }}>
-              <button type="button" onClick={() => setShowForm(false)} style={{ padding: '8px 16px', backgroundColor: '#1A1D26', color: '#9CA3AF', border: '1px solid #2A2D38', borderRadius: 6, cursor: 'pointer', fontSize: 13 }}>Cancel</button>
+              <button type="button" onClick={() => setShowForm(false)} style={{ padding: '8px 16px', backgroundColor: '#FFFFFF', color: '#6B7280', border: '1px solid #D1D5DB', borderRadius: 6, cursor: 'pointer', fontSize: 13 }}>Cancel</button>
               <button type="submit" style={{ padding: '8px 16px', backgroundColor: '#10B981', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>Create Driver</button>
             </div>
           </form>
@@ -125,33 +125,33 @@ export default function DriversPage() {
       )}
 
       {/* Table */}
-      <div style={{ backgroundColor: '#111420', border: '1px solid #1E2130', borderRadius: 8, overflow: 'hidden' }}>
+      <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 8, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
         {loading ? (
           <div style={{ padding: 20 }}>{[1,2,3,4].map(i => <div key={i} className="skeleton" style={{ height: 44, marginBottom: 6, borderRadius: 4 }} />)}</div>
         ) : drivers.length === 0 ? (
-          <div style={{ padding: 60, textAlign: 'center' }}><Users size={36} style={{ color: '#374151', marginBottom: 10 }} /><p style={{ color: '#4B5563', fontSize: 13 }}>No drivers found</p></div>
+          <div style={{ padding: 60, textAlign: 'center' }}><Users size={36} style={{ color: '#D1D5DB', marginBottom: 10 }} /><p style={{ color: '#6B7280', fontSize: 13 }}>No drivers found</p></div>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr style={{ borderBottom: '1px solid #1E2130' }}>
+              <tr style={{ borderBottom: '1px solid #E5E7EB' }}>
                 {['NAME', 'LICENSE NO.', 'LICENSE EXPIRY', 'PHONE', 'TRIPS', 'KM DRIVEN', 'SAFETY', 'STATUS'].map(h => (
-                  <th key={h} style={{ padding: '10px 14px', fontSize: 10, fontWeight: 600, color: '#4B5563', textTransform: 'uppercase', textAlign: 'left', letterSpacing: '0.06em' }}>{h}</th>
+                  <th key={h} style={{ padding: '10px 14px', fontSize: 10, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', textAlign: 'left', letterSpacing: '0.06em' }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {drivers.map(d => (
-                <tr key={d.id} style={{ borderBottom: '1px solid #1A1D26' }}>
-                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#E5E7EB', fontWeight: 500 }}>
-                    <Link href={`/drivers/${d.id}`} style={{ color: '#E5E7EB', textDecoration: 'none' }}>{d.name}</Link>
+                <tr key={d.id} style={{ borderBottom: '1px solid #F3F4F6' }}>
+                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#111827', fontWeight: 500 }}>
+                    <Link href={`/drivers/${d.id}`} style={{ color: '#111827', textDecoration: 'none', fontWeight: 600 }}>{d.name}</Link>
                   </td>
-                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#9CA3AF', fontFamily: 'monospace' }}>{d.license_number}</td>
-                  <td style={{ padding: '10px 14px', fontSize: 13, color: isExpired(d.license_expiry) ? '#EF4444' : '#9CA3AF' }}>
+                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#4B5563', fontFamily: 'monospace' }}>{d.license_number}</td>
+                  <td style={{ padding: '10px 14px', fontSize: 13, color: isExpired(d.license_expiry) ? '#EF4444' : '#4B5563' }}>
                     {new Date(d.license_expiry).toLocaleDateString()}{isExpired(d.license_expiry) && <span style={{ fontSize: 10, marginLeft: 6, color: '#EF4444' }}>EXPIRED</span>}
                   </td>
-                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#9CA3AF' }}>{d.phone}</td>
-                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#9CA3AF' }}>{d.total_trips}</td>
-                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#9CA3AF' }}>{Number(d.total_distance_km).toLocaleString()}</td>
+                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#4B5563' }}>{d.phone}</td>
+                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#4B5563' }}>{d.total_trips}</td>
+                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#4B5563' }}>{Number(d.total_distance_km).toLocaleString()}</td>
                   <td style={{ padding: '10px 14px' }}><SafetyBar score={d.safety_score} /></td>
                   <td style={{ padding: '10px 14px' }}><StatusBadge status={d.status} /></td>
                 </tr>

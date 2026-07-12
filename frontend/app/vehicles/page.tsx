@@ -99,7 +99,7 @@ export default function VehiclesPage() {
           <select
             value={typeFilter}
             onChange={e => setTypeFilter(e.target.value)}
-            style={{ padding: '7px 14px', backgroundColor: '#111420', border: '1px solid #1E2130', borderRadius: 6, color: '#9CA3AF', fontSize: 13 }}
+            style={{ padding: '7px 14px', backgroundColor: '#FFFFFF', border: '1px solid #D1D5DB', borderRadius: 6, color: '#4B5563', fontSize: 13 }}
           >
             <option value="">Type: All</option>
             <option value="VAN">Van</option>
@@ -110,7 +110,7 @@ export default function VehiclesPage() {
           <select
             value={statusFilter}
             onChange={e => setStatusFilter(e.target.value)}
-            style={{ padding: '7px 14px', backgroundColor: '#111420', border: '1px solid #1E2130', borderRadius: 6, color: '#9CA3AF', fontSize: 13 }}
+            style={{ padding: '7px 14px', backgroundColor: '#FFFFFF', border: '1px solid #D1D5DB', borderRadius: 6, color: '#4B5563', fontSize: 13 }}
           >
             <option value="">Status: All</option>
             <option value="AVAILABLE">Available</option>
@@ -119,17 +119,17 @@ export default function VehiclesPage() {
             <option value="RETIRED">Retired</option>
           </select>
           <div style={{ position: 'relative' }}>
-            <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#4B5563' }} />
+            <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
             <input
               placeholder="Search reg. no..."
               value={search}
               onChange={e => setSearch(e.target.value)}
               style={{
                 padding: '7px 10px 7px 32px',
-                backgroundColor: '#111420',
-                border: '1px solid #1E2130',
+                backgroundColor: '#FFFFFF',
+                border: '1px solid #D1D5DB',
                 borderRadius: 6,
-                color: '#9CA3AF',
+                color: '#111827',
                 fontSize: 13,
                 width: 200,
                 outline: 'none',
@@ -160,9 +160,9 @@ export default function VehiclesPage() {
 
       {/* Create Form */}
       {showForm && (
-        <div style={{ backgroundColor: '#111420', border: '1px solid #1E2130', borderRadius: 8, padding: 24, marginBottom: 20 }}>
-          <h3 style={{ fontSize: 15, fontWeight: 500, marginBottom: 16, color: '#E5E7EB' }}>New Vehicle</h3>
-          {formError && <div style={{ color: '#F87171', fontSize: 13, marginBottom: 12, padding: '8px 12px', backgroundColor: 'rgba(239,68,68,0.1)', borderRadius: 6 }}>{formError}</div>}
+        <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 8, padding: 24, marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
+          <h3 style={{ fontSize: 15, fontWeight: 500, marginBottom: 16, color: '#111827' }}>New Vehicle</h3>
+          {formError && <div style={{ color: '#DC2626', fontSize: 13, marginBottom: 12, padding: '8px 12px', backgroundColor: 'rgba(239,68,68,0.06)', borderRadius: 6 }}>{formError}</div>}
           <form onSubmit={handleCreate} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14 }}>
             <div><label style={{ fontSize: 11, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Registration Number</label><input value={formData.registration_number} onChange={e => setFormData({...formData, registration_number: e.target.value})} required style={{ marginTop: 4 }} /></div>
             <div><label style={{ fontSize: 11, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Name/Model</label><input value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required style={{ marginTop: 4 }} /></div>
@@ -171,7 +171,7 @@ export default function VehiclesPage() {
             <div><label style={{ fontSize: 11, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Acquisition Cost (₹)</label><input type="number" value={formData.acquisition_cost} onChange={e => setFormData({...formData, acquisition_cost: e.target.value})} required style={{ marginTop: 4 }} /></div>
             <div><label style={{ fontSize: 11, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Region</label><input value={formData.region} onChange={e => setFormData({...formData, region: e.target.value})} style={{ marginTop: 4 }} /></div>
             <div style={{ gridColumn: 'span 3', display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 8 }}>
-              <button type="button" onClick={() => setShowForm(false)} style={{ padding: '8px 16px', backgroundColor: '#1A1D26', color: '#9CA3AF', border: '1px solid #2A2D38', borderRadius: 6, cursor: 'pointer', fontSize: 13 }}>Cancel</button>
+              <button type="button" onClick={() => setShowForm(false)} style={{ padding: '8px 16px', backgroundColor: '#FFFFFF', color: '#6B7280', border: '1px solid #D1D5DB', borderRadius: 6, cursor: 'pointer', fontSize: 13 }}>Cancel</button>
               <button type="submit" style={{ padding: '8px 16px', backgroundColor: '#10B981', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>Create Vehicle</button>
             </div>
           </form>
@@ -179,34 +179,34 @@ export default function VehiclesPage() {
       )}
 
       {/* Table */}
-      <div style={{ backgroundColor: '#111420', border: '1px solid #1E2130', borderRadius: 8, overflow: 'hidden' }}>
+      <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 8, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
         {loading ? (
           <div style={{ padding: 20 }}>{[1,2,3,4].map(i => <div key={i} className="skeleton" style={{ height: 44, marginBottom: 6, borderRadius: 4 }} />)}</div>
         ) : vehicles.length === 0 ? (
           <div style={{ padding: 60, textAlign: 'center' }}>
-            <Truck size={36} style={{ color: '#374151', marginBottom: 10 }} />
-            <p style={{ color: '#4B5563', fontSize: 13 }}>No vehicles found</p>
+            <Truck size={36} style={{ color: '#D1D5DB', marginBottom: 10 }} />
+            <p style={{ color: '#6B7280', fontSize: 13 }}>No vehicles found</p>
           </div>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr style={{ borderBottom: '1px solid #1E2130' }}>
-                {['REG. NO. (UNIQUE)', 'NAME/MODE', 'TYPE', 'CAPACITY', 'ODOMETER', 'ACQ. COST', 'STATUS'].map(h => (
-                  <th key={h} style={{ padding: '10px 14px', fontSize: 10, fontWeight: 600, color: '#4B5563', textTransform: 'uppercase', textAlign: 'left', letterSpacing: '0.06em' }}>{h}</th>
+              <tr style={{ borderBottom: '1px solid #E5E7EB' }}>
+                {['REG. NO. (UNIQUE)', 'NAME/MODEL', 'TYPE', 'CAPACITY', 'ODOMETER', 'ACQ. COST', 'STATUS'].map(h => (
+                  <th key={h} style={{ padding: '10px 14px', fontSize: 10, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', textAlign: 'left', letterSpacing: '0.06em' }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {vehicles.map(v => (
-                <tr key={v.id} style={{ borderBottom: '1px solid #1A1D26' }}>
-                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#E5E7EB', fontFamily: 'monospace' }}>
-                    <Link href={`/vehicles/${v.id}`} style={{ color: '#E5E7EB', textDecoration: 'none' }}>{v.registration_number}</Link>
+                <tr key={v.id} style={{ borderBottom: '1px solid #F3F4F6' }}>
+                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#111827', fontFamily: 'monospace' }}>
+                    <Link href={`/vehicles/${v.id}`} style={{ color: '#111827', textDecoration: 'none', fontWeight: 600 }}>{v.registration_number}</Link>
                   </td>
-                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#E5E7EB', fontWeight: 500 }}>{v.name}</td>
-                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#9CA3AF' }}>{v.type.charAt(0) + v.type.slice(1).toLowerCase()}</td>
-                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#9CA3AF' }}>{Number(v.max_load_capacity).toLocaleString()} kg</td>
-                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#9CA3AF' }}>{Number(v.odometer).toLocaleString()}</td>
-                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#9CA3AF' }}>₹{Number(v.acquisition_cost).toLocaleString()}</td>
+                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#111827', fontWeight: 500 }}>{v.name}</td>
+                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#4B5563' }}>{v.type.charAt(0) + v.type.slice(1).toLowerCase()}</td>
+                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#4B5563' }}>{Number(v.max_load_capacity).toLocaleString()} kg</td>
+                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#4B5563' }}>{Number(v.odometer).toLocaleString()}</td>
+                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#4B5563' }}>₹{Number(v.acquisition_cost).toLocaleString()}</td>
                   <td style={{ padding: '10px 14px' }}><StatusBadge status={v.status} /></td>
                 </tr>
               ))}

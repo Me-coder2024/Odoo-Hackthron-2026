@@ -110,19 +110,19 @@ export default function DashboardPage() {
       {/* Filters row */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
         <span style={{ fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.06em' }}>FILTERS</span>
-        <select style={{ padding: '6px 12px', backgroundColor: '#111420', border: '1px solid #1E2130', borderRadius: 6, color: '#9CA3AF', fontSize: 13 }}>
+        <select style={{ padding: '6px 12px', backgroundColor: '#FFFFFF', border: '1px solid #D1D5DB', borderRadius: 6, color: '#4B5563', fontSize: 13 }}>
           <option>Vehicle Type: All</option>
           <option>Van</option>
           <option>Truck</option>
           <option>Bus</option>
         </select>
-        <select style={{ padding: '6px 12px', backgroundColor: '#111420', border: '1px solid #1E2130', borderRadius: 6, color: '#9CA3AF', fontSize: 13 }}>
+        <select style={{ padding: '6px 12px', backgroundColor: '#FFFFFF', border: '1px solid #D1D5DB', borderRadius: 6, color: '#4B5563', fontSize: 13 }}>
           <option>Status: All</option>
           <option>Available</option>
           <option>On Trip</option>
           <option>In Shop</option>
         </select>
-        <select style={{ padding: '6px 12px', backgroundColor: '#111420', border: '1px solid #1E2130', borderRadius: 6, color: '#9CA3AF', fontSize: 13 }}>
+        <select style={{ padding: '6px 12px', backgroundColor: '#FFFFFF', border: '1px solid #D1D5DB', borderRadius: 6, color: '#4B5563', fontSize: 13 }}>
           <option>Region: All</option>
         </select>
       </div>
@@ -133,17 +133,18 @@ export default function DashboardPage() {
           <div
             key={card.label}
             style={{
-              backgroundColor: '#111420',
-              border: '1px solid #1E2130',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #E5E7EB',
               borderTop: `3px solid ${card.border}`,
               borderRadius: 8,
               padding: '14px 16px',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
             }}
           >
             <div style={{ fontSize: 9, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8, lineHeight: 1.4 }}>
               {card.label}
             </div>
-            <div style={{ fontSize: 28, fontWeight: 700, color: '#E5E7EB' }}>
+            <div style={{ fontSize: 28, fontWeight: 700, color: '#111827' }}>
               {typeof card.value === 'number' ? String(card.value).padStart(2, '0') : card.value}
             </div>
           </div>
@@ -154,22 +155,22 @@ export default function DashboardPage() {
       <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 20 }}>
         {/* Recent Trips */}
         <div>
-          <h3 style={{ fontSize: 13, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 14 }}>RECENT TRIPS</h3>
-          <div style={{ backgroundColor: '#111420', border: '1px solid #1E2130', borderRadius: 8, overflow: 'hidden' }}>
+          <h3 style={{ fontSize: 13, fontWeight: 600, color: '#4B5563', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 14 }}>RECENT TRIPS</h3>
+          <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 8, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
-                <tr style={{ borderBottom: '1px solid #1E2130' }}>
+                <tr style={{ borderBottom: '1px solid #E5E7EB' }}>
                   {['TRIP', 'VEHICLE', 'DRIVER', 'STATUS', 'ETA'].map((h) => (
-                    <th key={h} style={{ padding: '10px 14px', fontSize: 10, fontWeight: 600, color: '#4B5563', textTransform: 'uppercase', textAlign: 'left', letterSpacing: '0.06em' }}>{h}</th>
+                    <th key={h} style={{ padding: '10px 14px', fontSize: 10, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', textAlign: 'left', letterSpacing: '0.06em' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {recentTrips.length > 0 ? recentTrips.map((trip) => (
-                  <tr key={trip.id} style={{ borderBottom: '1px solid #1A1D26' }}>
-                    <td style={{ padding: '10px 14px', fontSize: 13, color: '#E5E7EB', fontFamily: 'monospace' }}>{trip.trip_number}</td>
-                    <td style={{ padding: '10px 14px', fontSize: 13, color: '#9CA3AF' }}>{trip.vehicle?.name || '—'}</td>
-                    <td style={{ padding: '10px 14px', fontSize: 13, color: '#9CA3AF' }}>{trip.driver?.name || '—'}</td>
+                  <tr key={trip.id} style={{ borderBottom: '1px solid #F3F4F6' }}>
+                    <td style={{ padding: '10px 14px', fontSize: 13, color: '#111827', fontFamily: 'monospace' }}>{trip.trip_number}</td>
+                    <td style={{ padding: '10px 14px', fontSize: 13, color: '#4B5563' }}>{trip.vehicle?.name || '—'}</td>
+                    <td style={{ padding: '10px 14px', fontSize: 13, color: '#4B5563' }}>{trip.driver?.name || '—'}</td>
                     <td style={{ padding: '10px 14px' }}>
                       <span style={{
                         display: 'inline-block',
@@ -188,7 +189,7 @@ export default function DashboardPage() {
                     </td>
                   </tr>
                 )) : (
-                  <tr><td colSpan={5} style={{ padding: 24, textAlign: 'center', color: '#4B5563', fontSize: 13 }}>No recent trips</td></tr>
+                  <tr><td colSpan={5} style={{ padding: 24, textAlign: 'center', color: '#6B7280', fontSize: 13 }}>No recent trips</td></tr>
                 )}
               </tbody>
             </table>
@@ -197,18 +198,18 @@ export default function DashboardPage() {
 
         {/* Vehicle Status */}
         <div>
-          <h3 style={{ fontSize: 13, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 14 }}>VEHICLE STATUS</h3>
-          <div style={{ backgroundColor: '#111420', border: '1px solid #1E2130', borderRadius: 8, padding: 20 }}>
+          <h3 style={{ fontSize: 13, fontWeight: 600, color: '#4B5563', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 14 }}>VEHICLE STATUS</h3>
+          <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 8, padding: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               {vehicleStatusItems.map((item) => {
                 const pct = totalVehicles > 0 ? (item.count / totalVehicles) * 100 : 0;
                 const color = STATUS_COLORS[item.status] || '#475569';
                 return (
                   <div key={item.status} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <span style={{ fontSize: 12, color: '#9CA3AF', width: 70, textAlign: 'right' }}>
+                    <span style={{ fontSize: 12, color: '#4B5563', width: 70, textAlign: 'right' }}>
                       {item.status.replace('_', ' ').charAt(0).toUpperCase() + item.status.replace('_', ' ').slice(1).toLowerCase()}
                     </span>
-                    <div style={{ flex: 1, height: 18, backgroundColor: '#1A1D26', borderRadius: 3, overflow: 'hidden' }}>
+                    <div style={{ flex: 1, height: 18, backgroundColor: '#F3F4F6', borderRadius: 3, overflow: 'hidden' }}>
                       <div
                         style={{
                           width: `${pct}%`,

@@ -6,7 +6,7 @@ import prisma from '../models/prisma';
  */
 export async function generateTripNumber(): Promise<string> {
   const lastTrip = await prisma.trip.findFirst({
-    orderBy: { trip_number: 'desc' },
+    orderBy: { created_at: 'desc' },
     select: { trip_number: true },
   });
 
@@ -19,15 +19,5 @@ export async function generateTripNumber(): Promise<string> {
     }
   }
 
-  // Safety collision-check loop to guarantee uniqueness
-  while (true) {
-    const tripNum = `TRP-${nextNumber.toString().padStart(4, '0')}`;
-    const exists = await prisma.trip.findUnique({
-      where: { trip_number: tripNum },
-    });
-    if (!exists) {
-      return tripNum;
-    }
-    nextNumber++;
-  }
+  return `TRP-${nextNumber.toString().padStart(4, '0')}`;
 }

@@ -1,16 +1,16 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import api from '@/lib/api';
-import { Plus, Wrench } from 'lucide-react';
+import { Wrench } from 'lucide-react';
 
 const STATUS_BG: Record<string, string> = { ACTIVE: '#D97706', CLOSED: '#059669' };
 
 function StatusBadge({ status }: { status: string }) {
+  const label = status === 'ACTIVE' ? 'In Shop' : 'Completed';
   return (
-    <span style={{ display: 'inline-block', padding: '4px 14px', borderRadius: 4, fontSize: 12, fontWeight: 600, color: '#fff', backgroundColor: STATUS_BG[status] || '#374151', minWidth: 70, textAlign: 'center' }}>
-      {status}
+    <span style={{ display: 'inline-block', padding: '4px 16px', borderRadius: 4, fontSize: 12, fontWeight: 600, color: '#fff', backgroundColor: STATUS_BG[status] || '#374151' }}>
+      {label}
     </span>
   );
 }
@@ -18,97 +18,125 @@ function StatusBadge({ status }: { status: string }) {
 export default function MaintenancePage() {
   const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState('');
-  const [showForm, setShowForm] = useState(false);
   const [vehicles, setVehicles] = useState<any[]>([]);
-  const [formData, setFormData] = useState({ vehicle_id: '', service_type: '', description: '' });
+  const [formData, setFormData] = useState({ vehicle_id: '', service_type: '', cost: '', date: '', description: '' });
   const [formError, setFormError] = useState('');
 
   const fetchLogs = async () => {
-    try { const params: Record<string, string> = {}; if (statusFilter) params.status = statusFilter; const res = await api.get('/maintenance', { params }); setLogs(res.data.data); } catch (err) { console.error(err); } finally { setLoading(false); }
+    try { const res = await api.get('/maintenance'); setLogs(res.data.data); } catch (err) { console.error(err); } finally { setLoading(false); }
   };
-
-  useEffect(() => { fetchLogs(); }, [statusFilter]);
 
   const loadVehicles = async () => { try { const res = await api.get('/vehicles'); setVehicles(res.data.data); } catch (err) { console.error(err); } };
 
+  useEffect(() => { fetchLogs(); loadVehicles(); }, []);
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault(); setFormError('');
-    try { await api.post('/maintenance', formData); setShowForm(false); setFormData({ vehicle_id: '', service_type: '', description: '' }); fetchLogs(); }
-    catch (err: unknown) { const a = err as { response?: { data?: { message?: string } } }; setFormError(a.response?.data?.message || 'Failed'); }
+    try {
+      await api.post('/maintenance', { vehicle_id: formData.vehicle_id, service_type: formData.service_type, description: formData.description || formData.service_type });
+      setFormData({ vehicle_id: '', service_type: '', cost: '', date: '', description: '' });
+      fetchLogs();
+    } catch (err: unknown) { const a = err as { response?: { data?: { message?: string } } }; setFormError(a.response?.data?.message || 'Failed'); }
   };
 
-  const inputStyle = { width: '100%', padding: '10px 14px', backgroundColor: '#1A1D26', border: '1px solid #2A2D38', borderRadius: 6, color: '#E5E7EB', fontSize: 14, outline: 'none', marginTop: 4 };
+  const inputStyle: React.CSSProperties = { width: '100%', padding: '10px 14px', backgroundColor: '#FFFFFF', border: '1px solid #D1D5DB', borderRadius: 6, color: '#111827', fontSize: 14, outline: 'none', marginTop: 4 };
+  const labelStyle: React.CSSProperties = { fontSize: 10, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600, marginBottom: 2 };
 
   return (
-    <div>
-      {/* Filters + New */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <div style={{ display: 'flex', gap: 10 }}>
-          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ padding: '7px 14px', backgroundColor: '#111420', border: '1px solid #1E2130', borderRadius: 6, color: '#9CA3AF', fontSize: 13 }}>
-            <option value="">Status: All</option>
-            <option value="ACTIVE">Active</option>
-            <option value="CLOSED">Closed</option>
-          </select>
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+      {/* LEFT — Log Service Record Form */}
+      <div>
+        <div style={{ fontSize: 13, fontWeight: 600, color: '#4B5563', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 16 }}>LOG SERVICE RECORD</div>
+        <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div>
+            <label style={labelStyle}>VEHICLE</label>
+            <select value={formData.vehicle_id} onChange={e => setFormData({...formData, vehicle_id: e.target.value})} required style={inputStyle}>
+              <option value="">Select vehicle</option>
+              {vehicles.map(v => <option key={v.id} value={v.id}>{v.registration_number}</option>)}
+            </select>
+          </div>
+          <div>
+            <label style={labelStyle}>SERVICE TYPE</label>
+            <input value={formData.service_type} onChange={e => setFormData({...formData, service_type: e.target.value})} required style={inputStyle} placeholder="Oil Change" />
+          </div>
+          <div>
+            <label style={labelStyle}>COST</label>
+            <input type="number" value={formData.cost} onChange={e => setFormData({...formData, cost: e.target.value})} style={inputStyle} placeholder="2500" />
+          </div>
+          <div>
+            <label style={labelStyle}>DATE</label>
+            <input type="date" value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} style={inputStyle} />
+          </div>
+          <div>
+            <label style={labelStyle}>STATUS</label>
+            <input value="Active" disabled style={{ ...inputStyle, opacity: 0.6, backgroundColor: '#F3F4F6' }} />
+          </div>
+
+          {formError && <div style={{ color: '#DC2626', fontSize: 13, padding: '8px 12px', backgroundColor: 'rgba(239,68,68,0.06)', borderRadius: 6 }}>{formError}</div>}
+
+          <button type="submit" style={{
+            width: '100%', padding: '12px', backgroundColor: '#E67E00', color: '#fff',
+            border: 'none', borderRadius: 6, fontSize: 14, fontWeight: 600, cursor: 'pointer', marginTop: 4,
+          }}>
+            Save
+          </button>
+        </form>
+
+        {/* Flow Diagram */}
+        <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 12, color: '#10B981', fontWeight: 600 }}>Available</span>
+            <span style={{ flex: 1, borderBottom: '1px dashed #D1D5DB' }} />
+            <span style={{ fontSize: 11, color: '#6B7280' }}>creating service record</span>
+            <span style={{ flex: 1, borderBottom: '1px dashed #D1D5DB' }} />
+            <span style={{ fontSize: 11, color: '#6B7280' }}>→</span>
+            <span style={{ fontSize: 12, color: '#D97706', fontWeight: 600 }}>In Shop</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 12, color: '#D97706', fontWeight: 600 }}>In Shop</span>
+            <span style={{ flex: 1, borderBottom: '1px dashed #D1D5DB' }} />
+            <span style={{ fontSize: 11, color: '#6B7280' }}>close & cost finalized</span>
+            <span style={{ flex: 1, borderBottom: '1px dashed #D1D5DB' }} />
+            <span style={{ fontSize: 11, color: '#6B7280' }}>→</span>
+            <span style={{ fontSize: 12, color: '#10B981', fontWeight: 600 }}>Available</span>
+          </div>
+          <p style={{ fontSize: 11, color: '#E67E00', fontStyle: 'italic', marginTop: 4 }}>
+            Note: In Shop vehicles are removed from the dispatch pool.
+          </p>
         </div>
-        <button onClick={() => { setShowForm(!showForm); if (!showForm) loadVehicles(); }} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 18px', backgroundColor: '#E67E00', color: '#fff', border: 'none', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
-          <Plus size={16} /> New Service Log
-        </button>
       </div>
 
-      {/* Create Form */}
-      {showForm && (
-        <div style={{ backgroundColor: '#111420', border: '1px solid #1E2130', borderRadius: 8, padding: 24, marginBottom: 20 }}>
-          <h3 style={{ fontSize: 15, fontWeight: 500, marginBottom: 6, color: '#E5E7EB' }}>Create Maintenance Log</h3>
-          <p style={{ fontSize: 12, color: '#F59E0B', marginBottom: 16 }}>⚠ Creating a log will set the vehicle status to IN_SHOP</p>
-          {formError && <div style={{ color: '#F87171', fontSize: 13, marginBottom: 12, padding: '8px 12px', backgroundColor: 'rgba(239,68,68,0.1)', borderRadius: 6 }}>{formError}</div>}
-          <form onSubmit={handleCreate} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-            <div><label style={{ fontSize: 11, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>Vehicle</label><select value={formData.vehicle_id} onChange={e => setFormData({...formData, vehicle_id: e.target.value})} required style={inputStyle}><option value="">Select vehicle</option>{vehicles.map(v => <option key={v.id} value={v.id}>{v.name} — {v.registration_number}</option>)}</select></div>
-            <div><label style={{ fontSize: 11, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>Service Type</label><input value={formData.service_type} onChange={e => setFormData({...formData, service_type: e.target.value})} required style={inputStyle} placeholder="e.g., Oil Change, Brake Repair" /></div>
-            <div style={{ gridColumn: 'span 2' }}><label style={{ fontSize: 11, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>Description</label><textarea value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} rows={3} placeholder="Additional details..." style={{ ...inputStyle, resize: 'vertical' as const }} /></div>
-            <div style={{ gridColumn: 'span 2', display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 8 }}>
-              <button type="button" onClick={() => setShowForm(false)} style={{ padding: '8px 16px', backgroundColor: '#1A1D26', color: '#9CA3AF', border: '1px solid #2A2D38', borderRadius: 6, cursor: 'pointer', fontSize: 13 }}>Cancel</button>
-              <button type="submit" style={{ padding: '8px 16px', backgroundColor: '#E67E00', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>Create & Move to IN_SHOP</button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      {/* Table */}
-      <div style={{ backgroundColor: '#111420', border: '1px solid #1E2130', borderRadius: 8, overflow: 'hidden' }}>
-        {loading ? (
-          <div style={{ padding: 20 }}>{[1,2,3].map(i => <div key={i} className="skeleton" style={{ height: 44, marginBottom: 6, borderRadius: 4 }} />)}</div>
-        ) : logs.length === 0 ? (
-          <div style={{ padding: 60, textAlign: 'center' }}><Wrench size={36} style={{ color: '#374151', marginBottom: 10 }} /><p style={{ color: '#4B5563', fontSize: 13 }}>No maintenance logs</p></div>
-        ) : (
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid #1E2130' }}>
-                {['VEHICLE', 'SERVICE TYPE', 'STATUS', 'STARTED', 'CLOSED', 'COST', 'ITEMS'].map(h => (
-                  <th key={h} style={{ padding: '10px 14px', fontSize: 10, fontWeight: 600, color: '#4B5563', textTransform: 'uppercase', textAlign: 'left', letterSpacing: '0.06em' }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {logs.map(l => (
-                <tr key={l.id} style={{ borderBottom: '1px solid #1A1D26' }}>
-                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#E5E7EB' }}>{l.vehicle?.name} <span style={{ color: '#4B5563' }}>({l.vehicle?.registration_number})</span></td>
-                  <td style={{ padding: '10px 14px' }}><Link href={`/maintenance/${l.id}`} style={{ color: '#E5E7EB', textDecoration: 'none', fontSize: 13, fontWeight: 500 }}>{l.service_type}</Link></td>
-                  <td style={{ padding: '10px 14px' }}><StatusBadge status={l.status} /></td>
-                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#9CA3AF' }}>{new Date(l.started_at).toLocaleDateString()}</td>
-                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#9CA3AF' }}>{l.closed_at ? new Date(l.closed_at).toLocaleDateString() : '—'}</td>
-                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#E5E7EB', fontWeight: 500 }}>₹{Number(l.total_cost).toLocaleString()}</td>
-                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#9CA3AF' }}>{l._count?.items || 0}</td>
+      {/* RIGHT — Service Log Table */}
+      <div>
+        <div style={{ fontSize: 13, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 16 }}>SERVICE LOG</div>
+        <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 8, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
+          {loading ? (
+            <div style={{ padding: 20 }}>{[1,2,3].map(i => <div key={i} className="skeleton" style={{ height: 44, marginBottom: 6, borderRadius: 4 }} />)}</div>
+          ) : logs.length === 0 ? (
+            <div style={{ padding: 50, textAlign: 'center' }}><Wrench size={28} style={{ color: '#D1D5DB', marginBottom: 8 }} /><p style={{ color: '#6B7280', fontSize: 13 }}>No service logs</p></div>
+          ) : (
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid #E5E7EB' }}>
+                  {['VEHICLE', 'SERVICE', 'COST', 'STATUS'].map(h => (
+                    <th key={h} style={{ padding: '10px 14px', fontSize: 10, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', textAlign: 'left', letterSpacing: '0.06em' }}>{h}</th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+              </thead>
+              <tbody>
+                {logs.map(l => (
+                  <tr key={l.id} style={{ borderBottom: '1px solid #F3F4F6' }}>
+                    <td style={{ padding: '12px 14px', fontSize: 14, color: '#111827', fontWeight: 600 }}>{l.vehicle?.registration_number}</td>
+                    <td style={{ padding: '12px 14px', fontSize: 13, color: '#4B5563' }}>{l.service_type}</td>
+                    <td style={{ padding: '12px 14px', fontSize: 13, color: '#4B5563' }}>{Number(l.total_cost).toLocaleString()}</td>
+                    <td style={{ padding: '12px 14px' }}><StatusBadge status={l.status} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
       </div>
-
-      <p style={{ marginTop: 16, fontSize: 12, color: '#E67E00', fontStyle: 'italic' }}>
-        Vehicle status changes to IN_SHOP on create · Closing restores to AVAILABLE
-      </p>
     </div>
   );
 }

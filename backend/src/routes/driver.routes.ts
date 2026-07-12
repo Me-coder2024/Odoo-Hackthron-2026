@@ -18,10 +18,9 @@ router.post(
   requireRole('FLEET_MANAGER', 'SAFETY_OFFICER'),
   [
     body('name').notEmpty().withMessage('Driver name is required'),
-    body('license_number').matches(/^[A-Z]{2}-\d{2,4}-\d{4,8}$/i).withMessage('License number must be in standard format (e.g. DL-2020-001234)'),
+    body('license_number').notEmpty().withMessage('License number is required'),
     body('license_category').notEmpty().withMessage('License category is required'),
     body('license_expiry').isISO8601().withMessage('Valid license expiry date is required'),
-    body('contact_number').matches(/^[0-9]{10}$/).withMessage('Phone number must be exactly 10 digits'),
   ],
   validate,
   driverController.create
