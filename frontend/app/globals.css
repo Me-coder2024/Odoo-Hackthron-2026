@@ -1,20 +1,20 @@
 @import "tailwindcss";
 
 @theme {
-  /* Dark theme base */
-  --color-bg-primary: #0F172A;
-  --color-bg-surface: #1E293B;
-  --color-bg-elevated: #334155;
-  --color-bg-page: #020617;
+  /* Dark theme — matches mockup exactly */
+  --color-bg-primary: #111420;
+  --color-bg-surface: #1A1D26;
+  --color-bg-elevated: #2A2D38;
+  --color-bg-page: #0B0E14;
 
   /* Text */
-  --color-text-primary: #F8FAFC;
-  --color-text-secondary: #94A3B8;
-  --color-text-muted: #64748B;
+  --color-text-primary: #E5E7EB;
+  --color-text-secondary: #9CA3AF;
+  --color-text-muted: #6B7280;
 
   /* Borders */
-  --color-border-default: #334155;
-  --color-border-subtle: #1E293B;
+  --color-border-default: #1E2130;
+  --color-border-subtle: #1A1D26;
 
   /* Accent — Orange #E67E00 */
   --color-accent: #E67E00;
@@ -22,29 +22,11 @@
   --color-accent-light: #FFF3E0;
   --color-accent-muted: rgba(230, 126, 0, 0.15);
 
-  /* Semantic */
-  --color-success: #065F46;
-  --color-success-bg: #ECFDF5;
-  --color-warning: #92400E;
-  --color-warning-bg: #FFFBEB;
-  --color-danger: #991B1B;
-  --color-danger-bg: #FEF2F2;
-  --color-info: #1E3A5F;
-  --color-info-bg: #EFF6FF;
-
-  /* Status badge colors (dark mode versions) */
+  /* Status badge colors */
   --color-status-available: #10B981;
   --color-status-on-trip: #3B82F6;
   --color-status-in-shop: #F59E0B;
   --color-status-retired: #6B7280;
-  --color-status-draft: #8B5CF6;
-  --color-status-dispatched: #3B82F6;
-  --color-status-completed: #10B981;
-  --color-status-cancelled: #EF4444;
-  --color-status-suspended: #EF4444;
-  --color-status-off-duty: #6B7280;
-  --color-status-active: #10B981;
-  --color-status-closed: #6B7280;
 }
 
 * {
@@ -101,9 +83,9 @@ body {
 .skeleton {
   background: linear-gradient(
     90deg,
-    var(--color-bg-surface) 25%,
-    var(--color-bg-elevated) 50%,
-    var(--color-bg-surface) 75%
+    #1A1D26 25%,
+    #2A2D38 50%,
+    #1A1D26 75%
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
@@ -118,20 +100,20 @@ table {
 
 th {
   text-align: left;
-  font-weight: 500;
-  font-size: 12px;
+  font-weight: 600;
+  font-size: 10px;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--color-text-muted);
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--color-border-default);
+  letter-spacing: 0.06em;
+  color: #4B5563;
+  padding: 10px 14px;
+  border-bottom: 1px solid #1E2130;
 }
 
 td {
-  padding: 12px 16px;
-  font-size: 14px;
-  border-bottom: 1px solid var(--color-border-subtle);
-  color: var(--color-text-primary);
+  padding: 10px 14px;
+  font-size: 13px;
+  border-bottom: 1px solid #1A1D26;
+  color: #E5E7EB;
 }
 
 tr:hover td {
@@ -150,10 +132,10 @@ input[type="number"],
 input[type="date"],
 select,
 textarea {
-  background-color: var(--color-bg-primary);
-  border: 1px solid var(--color-border-default);
-  color: var(--color-text-primary);
-  padding: 8px 12px;
+  background-color: #1A1D26;
+  border: 1px solid #2A2D38;
+  color: #E5E7EB;
+  padding: 10px 14px;
   border-radius: 6px;
   font-size: 14px;
   width: 100%;
@@ -170,7 +152,7 @@ textarea:focus {
 
 input::placeholder,
 textarea::placeholder {
-  color: var(--color-text-muted);
+  color: #4B5563;
 }
 
 input:disabled,
@@ -183,30 +165,21 @@ textarea:disabled {
 /* Labels */
 label {
   display: block;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--color-text-secondary);
+  font-size: 11px;
+  font-weight: 600;
+  color: #6B7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   margin-bottom: 4px;
 }
 
 /* Custom select arrow */
 select {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394A3B8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
   background-position: right 8px center;
   background-repeat: no-repeat;
   background-size: 20px;
   padding-right: 36px;
-}
-
-/* Page transitions */
-.page-enter {
-  opacity: 0;
-  transform: translateY(8px);
-}
-
-.page-enter-active {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  cursor: pointer;
 }

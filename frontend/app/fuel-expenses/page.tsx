@@ -18,7 +18,7 @@ export default function FuelExpensesPage() {
 
   const fetchAll = async () => {
     try {
-      const [fRes, eRes, vRes] = await Promise.all([api.get('/fuel'), api.get('/expenses'), api.get('/vehicles')]);
+      const [fRes, eRes, vRes] = await Promise.all([api.get('/fuel-logs'), api.get('/expenses'), api.get('/vehicles')]);
       setFuelLogs(fRes.data.data);
       setExpenses(eRes.data.data);
       setVehicles(vRes.data.data);
@@ -33,7 +33,7 @@ export default function FuelExpensesPage() {
   const handleFuelCreate = async (e: React.FormEvent) => {
     e.preventDefault(); setFormError('');
     try {
-      await api.post('/fuel', { ...fuelForm, liters: parseFloat(fuelForm.liters), cost_per_liter: parseFloat(fuelForm.cost_per_liter), odometer_at_fill: parseFloat(fuelForm.odometer_at_fill) });
+      await api.post('/fuel-logs', { ...fuelForm, liters: parseFloat(fuelForm.liters), cost_per_liter: parseFloat(fuelForm.cost_per_liter), odometer_at_fill: parseFloat(fuelForm.odometer_at_fill) });
       setShowFuelForm(false); setFuelForm({ vehicle_id: '', liters: '', cost_per_liter: '', odometer_at_fill: '' }); fetchAll();
     } catch (err: unknown) { const a = err as { response?: { data?: { message?: string } } }; setFormError(a.response?.data?.message || 'Failed'); }
   };

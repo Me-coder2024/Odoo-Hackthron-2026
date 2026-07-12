@@ -12,6 +12,9 @@ const authRateLimiter = new RateLimiterMemory({
 });
 
 export async function globalRateLimit(req: Request, res: Response, next: NextFunction): Promise<void> {
+  if (process.env.NODE_ENV === 'development') {
+    return next();
+  }
   try {
     const key = req.ip || 'unknown';
     await rateLimiter.consume(key);
@@ -25,6 +28,9 @@ export async function globalRateLimit(req: Request, res: Response, next: NextFun
 }
 
 export async function authRateLimit(req: Request, res: Response, next: NextFunction): Promise<void> {
+  if (process.env.NODE_ENV === 'development') {
+    return next();
+  }
   try {
     const key = req.ip || 'unknown';
     await authRateLimiter.consume(key);

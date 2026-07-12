@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
-import { BarChart3, TrendingUp, Fuel, DollarSign, Download, Percent } from 'lucide-react';
+import { Download, Fuel, TrendingUp, DollarSign, Percent } from 'lucide-react';
 
 export default function AnalyticsPage() {
   const [kpis, setKpis] = useState<any>(null);
@@ -37,58 +37,100 @@ export default function AnalyticsPage() {
 
   const fmt = (n: number) => '₹' + n.toLocaleString('en-IN');
 
-  if (loading) return (<div><div className="skeleton" style={{ height: 28, width: 200, marginBottom: 24 }} /><div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 24 }}>{[1,2,3,4].map(i => <div key={i} className="skeleton" style={{ height: 100, borderRadius: 10 }} />)}</div><div className="skeleton" style={{ height: 400, borderRadius: 10 }} /></div>);
+  if (loading) return (
+    <div>
+      <div className="skeleton" style={{ height: 28, width: 200, marginBottom: 24 }} />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12, marginBottom: 24 }}>
+        {[1,2,3,4].map(i => <div key={i} className="skeleton" style={{ height: 90, borderRadius: 8 }} />)}
+      </div>
+      <div className="skeleton" style={{ height: 350, borderRadius: 8 }} />
+    </div>
+  );
+
+  const tabs = [
+    { key: 'overview', label: 'Overview' },
+    { key: 'fuel', label: 'Fuel Efficiency' },
+    { key: 'cost', label: 'Operational Cost' },
+    { key: 'roi', label: 'Vehicle ROI' },
+  ];
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <div><h1 style={{ fontSize: 24, fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: 4 }}>Analytics</h1><p style={{ fontSize: 14, color: 'var(--color-text-muted)' }}>Live-computed fleet intelligence</p></div>
-        <div style={{ display: 'flex', gap: 8 }}>
-          {['vehicles', 'trips', 'fuel-logs', 'expenses'].map(type => (
-            <button key={type} onClick={() => handleExport(type)} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 12px', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-default)', borderRadius: 6, color: 'var(--color-text-secondary)', fontSize: 12, cursor: 'pointer' }}>
-              <Download size={12} /> {type.replace('-', ' ')}
-            </button>
+      {/* Tabs + Export */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <div style={{ display: 'flex', gap: 4 }}>
+          {tabs.map(t => (
+            <button key={t.key} onClick={() => setActiveTab(t.key)} style={{
+              padding: '8px 18px', backgroundColor: activeTab === t.key ? '#E67E00' : '#1A1D26',
+              color: activeTab === t.key ? '#fff' : '#6B7280', border: '1px solid #2A2D38',
+              borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer',
+            }}>{t.label}</button>
           ))}
         </div>
+        <button onClick={() => handleExport('all')} style={{
+          display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px',
+          backgroundColor: '#10B981', color: '#fff', border: 'none', borderRadius: 6,
+          fontSize: 12, fontWeight: 600, cursor: 'pointer',
+        }}>
+          <Download size={14} /> Export CSV
+        </button>
       </div>
 
-      {/* Tabs */}
-      <div style={{ display: 'flex', gap: 0, marginBottom: 24, borderBottom: '1px solid var(--color-border-default)' }}>
-        {[{ key: 'overview', label: 'Overview' }, { key: 'fuel', label: 'Fuel Efficiency' }, { key: 'cost', label: 'Operational Cost' }, { key: 'roi', label: 'Vehicle ROI' }].map(t => (
-          <button key={t.key} onClick={() => setActiveTab(t.key)} style={{ padding: '10px 24px', backgroundColor: 'transparent', border: 'none', borderBottom: activeTab === t.key ? '2px solid var(--color-accent)' : '2px solid transparent', color: activeTab === t.key ? 'var(--color-accent)' : 'var(--color-text-muted)', fontSize: 14, fontWeight: 500, cursor: 'pointer' }}>{t.label}</button>
-        ))}
-      </div>
-
-      {activeTab === 'overview' && kpis && fleetUtil && (
-        <div>
-          {/* KPI row */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
-            {[
-              { icon: <Percent size={20} />, label: 'Fleet Utilization', value: `${fleetUtil.utilization_percent}%`, color: '#E67E00' },
-              { icon: <TrendingUp size={20} />, label: 'Revenue', value: fmt(kpis.financial.total_revenue), color: '#10B981' },
-              { icon: <DollarSign size={20} />, label: 'Net Profit', value: fmt(kpis.financial.net_profit), color: kpis.financial.net_profit >= 0 ? '#10B981' : '#EF4444' },
-              { icon: <Fuel size={20} />, label: 'Avg Fuel Eff.', value: fuelEff ? `${fuelEff.average_efficiency_km_per_liter} km/L` : '—', color: '#3B82F6' },
-            ].map(k => (
-              <div key={k.label} style={{ backgroundColor: 'var(--color-bg-primary)', border: '1px solid var(--color-border-default)', borderRadius: 10, padding: 20 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}><span style={{ color: k.color }}>{k.icon}</span><span style={{ fontSize: 12, color: 'var(--color-text-muted)', textTransform: 'uppercase' as const }}>{k.label}</span></div>
-                <div style={{ fontSize: 24, fontWeight: 600, color: 'var(--color-text-primary)' }}>{k.value}</div>
+      {/* KPI Summary Cards */}
+      {kpis && fleetUtil && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
+          {[
+            { icon: <Percent size={18} />, label: 'FLEET UTILIZATION', value: `${fleetUtil.utilization_percent}%`, border: '#E67E00' },
+            { icon: <TrendingUp size={18} />, label: 'TOTAL REVENUE', value: fmt(kpis.financial.total_revenue), border: '#10B981' },
+            { icon: <DollarSign size={18} />, label: 'NET PROFIT', value: fmt(kpis.financial.net_profit), border: kpis.financial.net_profit >= 0 ? '#10B981' : '#EF4444' },
+            { icon: <Fuel size={18} />, label: 'AVG FUEL EFF.', value: fuelEff ? `${fuelEff.average_efficiency_km_per_liter} km/L` : '—', border: '#3B82F6' },
+          ].map(k => (
+            <div key={k.label} style={{ backgroundColor: '#111420', border: '1px solid #1E2130', borderTop: `3px solid ${k.border}`, borderRadius: 8, padding: '16px 18px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <span style={{ color: k.border }}>{k.icon}</span>
+                <span style={{ fontSize: 9, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{k.label}</span>
               </div>
-            ))}
-          </div>
+              <div style={{ fontSize: 26, fontWeight: 700, color: '#E5E7EB' }}>{k.value}</div>
+            </div>
+          ))}
+        </div>
+      )}
 
-          {/* Fleet breakdown */}
-          <div style={{ backgroundColor: 'var(--color-bg-primary)', border: '1px solid var(--color-border-default)', borderRadius: 10, padding: 24 }}>
-            <h3 style={{ fontSize: 14, fontWeight: 500, marginBottom: 16, color: 'var(--color-text-primary)' }}>Fleet Status Breakdown</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+      {/* Overview Tab — Fleet breakdown + bar visualization */}
+      {activeTab === 'overview' && kpis && fleetUtil && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          {/* Fleet Status breakdown */}
+          <div style={{ backgroundColor: '#111420', border: '1px solid #1E2130', borderRadius: 8, padding: 20 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 16 }}>FLEET STATUS BREAKDOWN</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               {[
                 { label: 'Available', value: kpis.fleet.available, color: '#10B981' },
                 { label: 'On Trip', value: kpis.fleet.on_trip, color: '#3B82F6' },
                 { label: 'In Shop', value: kpis.fleet.in_shop, color: '#F59E0B' },
-                { label: 'Retired', value: kpis.fleet.retired, color: '#6B7280' },
+                { label: 'Retired', value: kpis.fleet.retired, color: '#EF4444' },
               ].map(s => (
-                <div key={s.label} style={{ textAlign: 'center', padding: 20, backgroundColor: 'var(--color-bg-surface)', borderRadius: 8, borderLeft: `3px solid ${s.color}` }}>
-                  <div style={{ fontSize: 32, fontWeight: 600, color: s.color }}>{s.value}</div>
-                  <div style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 4 }}>{s.label}</div>
+                <div key={s.label} style={{ textAlign: 'center', padding: 16, backgroundColor: '#0B0E14', borderRadius: 6, borderLeft: `3px solid ${s.color}` }}>
+                  <div style={{ fontSize: 28, fontWeight: 700, color: s.color }}>{s.value}</div>
+                  <div style={{ fontSize: 11, color: '#6B7280', marginTop: 4 }}>{s.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Financial Summary */}
+          <div style={{ backgroundColor: '#111420', border: '1px solid #1E2130', borderRadius: 8, padding: 20 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 16 }}>FINANCIAL SUMMARY</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {[
+                { label: 'Total Revenue', value: fmt(kpis.financial.total_revenue), color: '#10B981' },
+                { label: 'Fuel Cost', value: fmt(kpis.financial.total_fuel_cost), color: '#EF4444' },
+                { label: 'Maintenance', value: fmt(kpis.financial.total_maintenance_cost), color: '#F59E0B' },
+                { label: 'Expenses', value: fmt(kpis.financial.total_expenses), color: '#8B5CF6' },
+                { label: 'Net Profit', value: fmt(kpis.financial.net_profit), color: kpis.financial.net_profit >= 0 ? '#10B981' : '#EF4444' },
+              ].map(f => (
+                <div key={f.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', backgroundColor: '#0B0E14', borderRadius: 6 }}>
+                  <span style={{ fontSize: 13, color: '#9CA3AF' }}>{f.label}</span>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: f.color }}>{f.value}</span>
                 </div>
               ))}
             </div>
@@ -96,51 +138,89 @@ export default function AnalyticsPage() {
         </div>
       )}
 
+      {/* Fuel Efficiency Tab */}
       {activeTab === 'fuel' && fuelEff && (
         <div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 24 }}>
-            <div style={{ backgroundColor: 'var(--color-bg-primary)', border: '1px solid var(--color-border-default)', borderRadius: 10, padding: 20, textAlign: 'center' }}>
-              <div style={{ fontSize: 28, fontWeight: 600, color: 'var(--color-accent)' }}>{fuelEff.average_efficiency_km_per_liter}</div><div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>Avg Efficiency (km/L)</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 20 }}>
+            <div style={{ backgroundColor: '#111420', border: '1px solid #1E2130', borderTop: '3px solid #E67E00', borderRadius: 8, padding: '16px 18px', textAlign: 'center' }}>
+              <div style={{ fontSize: 9, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', marginBottom: 6 }}>AVG EFFICIENCY</div>
+              <div style={{ fontSize: 28, fontWeight: 700, color: '#E67E00' }}>{fuelEff.average_efficiency_km_per_liter} km/L</div>
             </div>
-            <div style={{ backgroundColor: 'var(--color-bg-primary)', border: '1px solid var(--color-border-default)', borderRadius: 10, padding: 20, textAlign: 'center' }}>
-              <div style={{ fontSize: 28, fontWeight: 600, color: 'var(--color-text-primary)' }}>{fuelEff.total_distance.toLocaleString()}</div><div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>Total Distance (km)</div>
+            <div style={{ backgroundColor: '#111420', border: '1px solid #1E2130', borderTop: '3px solid #3B82F6', borderRadius: 8, padding: '16px 18px', textAlign: 'center' }}>
+              <div style={{ fontSize: 9, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', marginBottom: 6 }}>TOTAL DISTANCE</div>
+              <div style={{ fontSize: 28, fontWeight: 700, color: '#E5E7EB' }}>{fuelEff.total_distance.toLocaleString()} km</div>
             </div>
-            <div style={{ backgroundColor: 'var(--color-bg-primary)', border: '1px solid var(--color-border-default)', borderRadius: 10, padding: 20, textAlign: 'center' }}>
-              <div style={{ fontSize: 28, fontWeight: 600, color: 'var(--color-text-primary)' }}>{fuelEff.total_fuel.toLocaleString()}</div><div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>Total Fuel (L)</div>
+            <div style={{ backgroundColor: '#111420', border: '1px solid #1E2130', borderTop: '3px solid #10B981', borderRadius: 8, padding: '16px 18px', textAlign: 'center' }}>
+              <div style={{ fontSize: 9, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', marginBottom: 6 }}>TOTAL FUEL</div>
+              <div style={{ fontSize: 28, fontWeight: 700, color: '#E5E7EB' }}>{fuelEff.total_fuel.toLocaleString()} L</div>
             </div>
           </div>
-          <div style={{ backgroundColor: 'var(--color-bg-primary)', border: '1px solid var(--color-border-default)', borderRadius: 10, overflow: 'hidden' }}>
-            <table><thead><tr><th>Trip</th><th>Vehicle</th><th>Type</th><th>Distance</th><th>Fuel</th><th>Efficiency</th></tr></thead>
-            <tbody>{fuelEff.trips.map((t: any) => (<tr key={t.trip_number}><td style={{ fontFamily: 'monospace', fontSize: 13 }}>{t.trip_number}</td><td>{t.vehicle} ({t.vehicle_reg})</td><td>{t.vehicle_type}</td><td>{t.actual_distance} km</td><td>{t.fuel_consumed} L</td><td style={{ fontWeight: 500, color: t.efficiency_km_per_liter >= fuelEff.average_efficiency_km_per_liter ? '#10B981' : '#EF4444' }}>{t.efficiency_km_per_liter} km/L</td></tr>))}</tbody></table>
+          <div style={{ backgroundColor: '#111420', border: '1px solid #1E2130', borderRadius: 8, overflow: 'hidden' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead><tr style={{ borderBottom: '1px solid #1E2130' }}>
+                {['TRIP', 'VEHICLE', 'TYPE', 'DISTANCE', 'FUEL', 'EFFICIENCY'].map(h => <th key={h} style={{ padding: '10px 14px', fontSize: 10, fontWeight: 600, color: '#4B5563', textTransform: 'uppercase', textAlign: 'left', letterSpacing: '0.06em' }}>{h}</th>)}
+              </tr></thead>
+              <tbody>{fuelEff.trips.map((t: any) => (
+                <tr key={t.trip_number} style={{ borderBottom: '1px solid #1A1D26' }}>
+                  <td style={{ padding: '10px 14px', fontSize: 13, fontFamily: 'monospace', color: '#E5E7EB' }}>{t.trip_number}</td>
+                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#9CA3AF' }}>{t.vehicle} ({t.vehicle_reg})</td>
+                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#6B7280' }}>{t.vehicle_type}</td>
+                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#9CA3AF' }}>{t.actual_distance} km</td>
+                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#9CA3AF' }}>{t.fuel_consumed} L</td>
+                  <td style={{ padding: '10px 14px', fontSize: 13, fontWeight: 600, color: t.efficiency_km_per_liter >= fuelEff.average_efficiency_km_per_liter ? '#10B981' : '#EF4444' }}>{t.efficiency_km_per_liter} km/L</td>
+                </tr>
+              ))}</tbody>
+            </table>
           </div>
         </div>
       )}
 
+      {/* Operational Cost Tab */}
       {activeTab === 'cost' && opCost && (
         <div>
-          <div style={{ backgroundColor: 'var(--color-bg-primary)', border: '1px solid var(--color-border-default)', borderRadius: 10, padding: 20, marginBottom: 24, textAlign: 'center' }}>
-            <div style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 4 }}>TOTAL OPERATIONAL COST</div>
-            <div style={{ fontSize: 32, fontWeight: 600, color: 'var(--color-accent)' }}>{fmt(opCost.total_operational_cost)}</div>
+          <div style={{ backgroundColor: '#111420', border: '1px solid #1E2130', borderTop: '3px solid #E67E00', borderRadius: 8, padding: '16px 18px', marginBottom: 20, textAlign: 'center' }}>
+            <div style={{ fontSize: 9, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', marginBottom: 6 }}>TOTAL OPERATIONAL COST</div>
+            <div style={{ fontSize: 32, fontWeight: 700, color: '#E67E00' }}>{fmt(opCost.total_operational_cost)}</div>
           </div>
-          <div style={{ backgroundColor: 'var(--color-bg-primary)', border: '1px solid var(--color-border-default)', borderRadius: 10, overflow: 'hidden' }}>
-            <table><thead><tr><th>Vehicle</th><th>Type</th><th>Fuel Cost</th><th>Maintenance</th><th>Expenses</th><th>Total</th></tr></thead>
-            <tbody>{opCost.vehicles.map((v: any) => (<tr key={v.vehicle_id}><td>{v.vehicle_name} <span style={{ color: 'var(--color-text-muted)', fontSize: 12 }}>({v.registration_number})</span></td><td>{v.vehicle_type}</td><td>{fmt(v.fuel_cost)}</td><td>{fmt(v.maintenance_cost)}</td><td>{fmt(v.expense_cost)}</td><td style={{ fontWeight: 600, color: 'var(--color-accent)' }}>{fmt(v.total_operational_cost)}</td></tr>))}</tbody></table>
+          <div style={{ backgroundColor: '#111420', border: '1px solid #1E2130', borderRadius: 8, overflow: 'hidden' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead><tr style={{ borderBottom: '1px solid #1E2130' }}>
+                {['VEHICLE', 'TYPE', 'FUEL COST', 'MAINTENANCE', 'EXPENSES', 'TOTAL'].map(h => <th key={h} style={{ padding: '10px 14px', fontSize: 10, fontWeight: 600, color: '#4B5563', textTransform: 'uppercase', textAlign: 'left', letterSpacing: '0.06em' }}>{h}</th>)}
+              </tr></thead>
+              <tbody>{opCost.vehicles.map((v: any) => (
+                <tr key={v.vehicle_id} style={{ borderBottom: '1px solid #1A1D26' }}>
+                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#E5E7EB' }}>{v.vehicle_name} <span style={{ color: '#4B5563' }}>({v.registration_number})</span></td>
+                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#6B7280' }}>{v.vehicle_type}</td>
+                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#9CA3AF' }}>{fmt(v.fuel_cost)}</td>
+                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#9CA3AF' }}>{fmt(v.maintenance_cost)}</td>
+                  <td style={{ padding: '10px 14px', fontSize: 13, color: '#9CA3AF' }}>{fmt(v.expense_cost)}</td>
+                  <td style={{ padding: '10px 14px', fontSize: 13, fontWeight: 600, color: '#E67E00' }}>{fmt(v.total_operational_cost)}</td>
+                </tr>
+              ))}</tbody>
+            </table>
           </div>
         </div>
       )}
 
+      {/* ROI Tab */}
       {activeTab === 'roi' && roi && (
-        <div style={{ backgroundColor: 'var(--color-bg-primary)', border: '1px solid var(--color-border-default)', borderRadius: 10, overflow: 'hidden' }}>
-          <table><thead><tr><th>Vehicle</th><th>Status</th><th>Acquisition</th><th>Revenue</th><th>Costs</th><th>Net Profit</th><th>ROI %</th></tr></thead>
-          <tbody>{roi.vehicles.map((v: any) => (<tr key={v.vehicle_id}>
-            <td>{v.vehicle_name} <span style={{ color: 'var(--color-text-muted)', fontSize: 12 }}>({v.registration_number})</span></td>
-            <td>{v.status}</td>
-            <td>{fmt(v.acquisition_cost)}</td>
-            <td>{fmt(v.total_revenue)}</td>
-            <td>{fmt(v.fuel_cost + v.maintenance_cost)}</td>
-            <td style={{ fontWeight: 500, color: v.net_profit >= 0 ? '#10B981' : '#EF4444' }}>{fmt(v.net_profit)}</td>
-            <td><span style={{ fontSize: 13, fontWeight: 600, color: v.roi_percent >= 0 ? '#10B981' : '#EF4444' }}>{v.roi_percent}%</span></td>
-          </tr>))}</tbody></table>
+        <div style={{ backgroundColor: '#111420', border: '1px solid #1E2130', borderRadius: 8, overflow: 'hidden' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead><tr style={{ borderBottom: '1px solid #1E2130' }}>
+              {['VEHICLE', 'STATUS', 'ACQUISITION', 'REVENUE', 'COSTS', 'NET PROFIT', 'ROI %'].map(h => <th key={h} style={{ padding: '10px 14px', fontSize: 10, fontWeight: 600, color: '#4B5563', textTransform: 'uppercase', textAlign: 'left', letterSpacing: '0.06em' }}>{h}</th>)}
+            </tr></thead>
+            <tbody>{roi.vehicles.map((v: any) => (
+              <tr key={v.vehicle_id} style={{ borderBottom: '1px solid #1A1D26' }}>
+                <td style={{ padding: '10px 14px', fontSize: 13, color: '#E5E7EB' }}>{v.vehicle_name} <span style={{ color: '#4B5563' }}>({v.registration_number})</span></td>
+                <td style={{ padding: '10px 14px' }}><span style={{ padding: '3px 10px', borderRadius: 4, fontSize: 11, fontWeight: 600, color: '#fff', backgroundColor: v.status === 'AVAILABLE' ? '#059669' : v.status === 'ON_TRIP' ? '#2563EB' : v.status === 'IN_SHOP' ? '#D97706' : '#DC2626' }}>{v.status.replace('_', ' ')}</span></td>
+                <td style={{ padding: '10px 14px', fontSize: 13, color: '#9CA3AF' }}>{fmt(v.acquisition_cost)}</td>
+                <td style={{ padding: '10px 14px', fontSize: 13, color: '#10B981' }}>{fmt(v.total_revenue)}</td>
+                <td style={{ padding: '10px 14px', fontSize: 13, color: '#EF4444' }}>{fmt(v.fuel_cost + v.maintenance_cost)}</td>
+                <td style={{ padding: '10px 14px', fontSize: 13, fontWeight: 600, color: v.net_profit >= 0 ? '#10B981' : '#EF4444' }}>{fmt(v.net_profit)}</td>
+                <td style={{ padding: '10px 14px', fontSize: 14, fontWeight: 700, color: v.roi_percent >= 0 ? '#10B981' : '#EF4444' }}>{v.roi_percent}%</td>
+              </tr>
+            ))}</tbody>
+          </table>
         </div>
       )}
     </div>
