@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
-import { Wrench } from 'lucide-react';
+import { Icon } from '@iconify/react';
 
 const STATUS_BG: Record<string, string> = { ACTIVE: '#D97706', CLOSED: '#059669' };
 
@@ -39,7 +39,8 @@ export default function MaintenancePage() {
     } catch (err: unknown) { const a = err as { response?: { data?: { message?: string } } }; setFormError(a.response?.data?.message || 'Failed'); }
   };
 
-  const inputStyle: React.CSSProperties = { width: '100%', padding: '10px 14px', backgroundColor: '#FFFFFF', border: '1px solid #D1D5DB', borderRadius: 6, color: '#111827', fontSize: 14, outline: 'none', marginTop: 4 };
+  const inputStyle: React.CSSProperties = { width: '100%', padding: '10px 14px', backgroundColor: '#FFFFFF', border: '1px solid #111827', borderRadius: 6, color: '#111827', fontSize: 14, outline: 'none', marginTop: 4 };
+  const selectStyle: React.CSSProperties = { ...inputStyle, padding: '10px 36px 10px 14px' };
   const labelStyle: React.CSSProperties = { fontSize: 10, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600, marginBottom: 2 };
 
   return (
@@ -50,14 +51,14 @@ export default function MaintenancePage() {
         <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div>
             <label style={labelStyle}>VEHICLE</label>
-            <select value={formData.vehicle_id} onChange={e => setFormData({...formData, vehicle_id: e.target.value})} required style={inputStyle}>
+            <select value={formData.vehicle_id} onChange={e => setFormData({...formData, vehicle_id: e.target.value})} required style={selectStyle}>
               <option value="">Select vehicle</option>
               {vehicles.map(v => <option key={v.id} value={v.id}>{v.registration_number}</option>)}
             </select>
           </div>
           <div>
             <label style={labelStyle}>SERVICE TYPE</label>
-            <input value={formData.service_type} onChange={e => setFormData({...formData, service_type: e.target.value})} required style={inputStyle} placeholder="Oil Change" />
+            <input type="text" value={formData.service_type} onChange={e => setFormData({...formData, service_type: e.target.value})} required style={inputStyle} placeholder="Oil Change" />
           </div>
           <div>
             <label style={labelStyle}>COST</label>
@@ -69,13 +70,13 @@ export default function MaintenancePage() {
           </div>
           <div>
             <label style={labelStyle}>STATUS</label>
-            <input value="Active" disabled style={{ ...inputStyle, opacity: 0.6, backgroundColor: '#F3F4F6' }} />
+            <input type="text" value="Active" disabled style={{ ...inputStyle, opacity: 0.6, backgroundColor: '#F3F4F6' }} />
           </div>
 
           {formError && <div style={{ color: '#DC2626', fontSize: 13, padding: '8px 12px', backgroundColor: 'rgba(239,68,68,0.06)', borderRadius: 6 }}>{formError}</div>}
 
           <button type="submit" style={{
-            width: '100%', padding: '12px', backgroundColor: '#E67E00', color: '#fff',
+            width: '100%', padding: '12px', backgroundColor: '#1542C2', color: '#fff',
             border: 'none', borderRadius: 6, fontSize: 14, fontWeight: 600, cursor: 'pointer', marginTop: 4,
           }}>
             Save
@@ -100,7 +101,7 @@ export default function MaintenancePage() {
             <span style={{ fontSize: 11, color: '#6B7280' }}>→</span>
             <span style={{ fontSize: 12, color: '#10B981', fontWeight: 600 }}>Available</span>
           </div>
-          <p style={{ fontSize: 11, color: '#E67E00', fontStyle: 'italic', marginTop: 4 }}>
+          <p style={{ fontSize: 11, color: '#1542C2', fontStyle: 'italic', marginTop: 4 }}>
             Note: In Shop vehicles are removed from the dispatch pool.
           </p>
         </div>
@@ -113,7 +114,7 @@ export default function MaintenancePage() {
           {loading ? (
             <div style={{ padding: 20 }}>{[1,2,3].map(i => <div key={i} className="skeleton" style={{ height: 44, marginBottom: 6, borderRadius: 4 }} />)}</div>
           ) : logs.length === 0 ? (
-            <div style={{ padding: 50, textAlign: 'center' }}><Wrench size={28} style={{ color: '#D1D5DB', marginBottom: 8 }} /><p style={{ color: '#6B7280', fontSize: 13 }}>No service logs</p></div>
+            <div style={{ padding: 50, textAlign: 'center' }}><Icon icon="mdi:wrench" width="28" height="28" style={{ color: '#D1D5DB', marginBottom: 8 }} /><p style={{ color: '#6B7280', fontSize: 13 }}>No service logs</p></div>
           ) : (
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>

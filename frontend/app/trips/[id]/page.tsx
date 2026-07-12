@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import api from '@/lib/api';
-import { ArrowLeft, Play, CheckCircle, XCircle } from 'lucide-react';
+import { Icon } from '@iconify/react';
 
 export default function TripDetailPage() {
   const { id } = useParams();
@@ -78,7 +78,7 @@ export default function TripDetailPage() {
   return (
     <div>
       <button onClick={() => router.back()} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', marginBottom: 20, fontSize: 13 }}>
-        <ArrowLeft size={16} /> Back to Trips
+        <Icon icon="mdi:arrow-left" width="16" height="16" /> Back to Trips
       </button>
 
       {error && <div style={{ color: '#EF4444', fontSize: 13, marginBottom: 16, padding: '10px 14px', backgroundColor: 'rgba(239,68,68,0.1)', borderRadius: 8, border: '1px solid rgba(239,68,68,0.2)' }}>{error}</div>}
@@ -118,22 +118,22 @@ export default function TripDetailPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {trip.status === 'DRAFT' && (
             <button onClick={handleDispatch} disabled={!!actionLoading} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 20px', backgroundColor: '#3B82F6', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 500, cursor: actionLoading ? 'not-allowed' : 'pointer', opacity: actionLoading ? 0.6 : 1 }}>
-              <Play size={16} /> {actionLoading === 'dispatch' ? 'Dispatching...' : 'Dispatch Trip'}
+              <Icon icon="mdi:play" width="16" height="16" /> {actionLoading === 'dispatch' ? 'Dispatching...' : 'Dispatch Trip'}
             </button>
           )}
           {trip.status === 'DISPATCHED' && (
             <>
               <button onClick={() => setShowComplete(true)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 20px', backgroundColor: '#10B981', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 500, cursor: 'pointer' }}>
-                <CheckCircle size={16} /> Complete Trip
+                <Icon icon="mdi:check-circle" width="16" height="16" /> Complete Trip
               </button>
               <button onClick={handleCancel} disabled={!!actionLoading} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 20px', backgroundColor: 'transparent', color: '#EF4444', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 8, fontSize: 14, fontWeight: 500, cursor: actionLoading ? 'not-allowed' : 'pointer' }}>
-                <XCircle size={16} /> {actionLoading === 'cancel' ? 'Cancelling...' : 'Cancel Trip'}
+                <Icon icon="mdi:close-circle" width="16" height="16" /> {actionLoading === 'cancel' ? 'Cancelling...' : 'Cancel Trip'}
               </button>
             </>
           )}
           {trip.status === 'COMPLETED' && (
             <div style={{ backgroundColor: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: 8, padding: 16, textAlign: 'center' }}>
-              <CheckCircle size={24} style={{ color: '#10B981', marginBottom: 8 }} />
+              <Icon icon="mdi:check-circle" width="24" height="24" style={{ color: '#10B981', marginBottom: 8 }} />
               <p style={{ fontSize: 13, color: '#10B981', fontWeight: 500 }}>Trip Completed</p>
               <p style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 4 }}>{trip.completed_at ? new Date(trip.completed_at).toLocaleString() : ''}</p>
             </div>
@@ -146,10 +146,10 @@ export default function TripDetailPage() {
         <div style={{ backgroundColor: 'var(--color-bg-primary)', border: '1px solid var(--color-border-default)', borderRadius: 10, padding: 24, marginBottom: 24 }}>
           <h3 style={{ fontSize: 16, fontWeight: 500, marginBottom: 16, color: 'var(--color-text-primary)' }}>Complete Trip — Final Metrics</h3>
           <form onSubmit={handleComplete} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-            <div><label>Final Odometer (km)</label><input type="number" value={completeData.final_odometer} onChange={e => setCompleteData({...completeData, final_odometer: e.target.value})} required /></div>
-            <div><label>Fuel Consumed (L)</label><input type="number" step="0.1" value={completeData.fuel_consumed} onChange={e => setCompleteData({...completeData, fuel_consumed: e.target.value})} required /></div>
-            <div><label>Actual Distance (km)</label><input type="number" value={completeData.actual_distance} onChange={e => setCompleteData({...completeData, actual_distance: e.target.value})} required /></div>
-            <div><label>Revenue (₹)</label><input type="number" value={completeData.revenue} onChange={e => setCompleteData({...completeData, revenue: e.target.value})} required /></div>
+            <div><label>Final Odometer (km)</label><input type="number" placeholder="15200" value={completeData.final_odometer} onChange={e => setCompleteData({...completeData, final_odometer: e.target.value})} required /></div>
+            <div><label>Fuel Consumed (L)</label><input type="number" step="0.1" placeholder="120" value={completeData.fuel_consumed} onChange={e => setCompleteData({...completeData, fuel_consumed: e.target.value})} required /></div>
+            <div><label>Actual Distance (km)</label><input type="number" placeholder="350" value={completeData.actual_distance} onChange={e => setCompleteData({...completeData, actual_distance: e.target.value})} required /></div>
+            <div><label>Revenue (₹)</label><input type="number" placeholder="25000" value={completeData.revenue} onChange={e => setCompleteData({...completeData, revenue: e.target.value})} required /></div>
             <div style={{ gridColumn: 'span 2', display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
               <button type="button" onClick={() => setShowComplete(false)} style={{ padding: '8px 16px', backgroundColor: 'var(--color-bg-surface)', color: 'var(--color-text-secondary)', border: '1px solid var(--color-border-default)', borderRadius: 6, cursor: 'pointer', fontSize: 13 }}>Cancel</button>
               <button type="submit" disabled={!!actionLoading} style={{ padding: '8px 16px', backgroundColor: '#10B981', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 13, fontWeight: 500 }}>{actionLoading === 'complete' ? 'Completing...' : 'Complete Trip'}</button>

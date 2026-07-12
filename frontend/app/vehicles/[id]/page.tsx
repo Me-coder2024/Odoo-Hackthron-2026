@@ -3,13 +3,16 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import api from '@/lib/api';
-import { ArrowLeft, Truck, Route, Wrench, Fuel } from 'lucide-react';
+import { Icon } from '@iconify/react';
+import { useAuthStore } from '@/hooks/useAuth';
 
 export default function VehicleDetailPage() {
   const { id } = useParams();
   const router = useRouter();
   const [vehicle, setVehicle] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuthStore();
+  const canManageStatus = user?.role === 'FLEET_MANAGER';
 
   useEffect(() => {
     api.get(`/vehicles/${id}`).then(res => setVehicle(res.data.data)).catch(console.error).finally(() => setLoading(false));
@@ -24,7 +27,7 @@ export default function VehicleDetailPage() {
   return (
     <div>
       <button onClick={() => router.back()} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', marginBottom: 20, fontSize: 13 }}>
-        <ArrowLeft size={16} /> Back to Vehicles
+        <Icon icon="mdi:arrow-left" width="16" height="16" /> Back to Vehicles
       </button>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 24 }}>
@@ -35,9 +38,40 @@ export default function VehicleDetailPage() {
               <h1 style={{ fontSize: 22, fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: 4 }}>{vehicle.name}</h1>
               <p style={{ fontSize: 14, fontFamily: 'monospace', color: 'var(--color-text-muted)' }}>{vehicle.registration_number}</p>
             </div>
-            <span style={{ padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 500, backgroundColor: `${color}18`, color, border: `1px solid ${color}30` }}>
-              {vehicle.status.replace('_', ' ')}
-            </span>
+            {canManageStatus ? (
+              <select
+                value={vehicle.status}
+                onChange={async (e) => {
+                  try {
+                    const nextStatus = e.target.value;
+                    await api.patch(`/vehicles/${id}`, { status: nextStatus });
+                    setVehicle({ ...vehicle, status: nextStatus });
+                  } catch (e) {
+                    console.error(e);
+                  }
+                }}
+                style={{
+                  padding: '7px 36px 7px 14px',
+                  borderRadius: 20,
+                  fontSize: 12,
+                  fontWeight: 500,
+                  backgroundColor: `${STATUS_COLORS[vehicle.status] || '#6B7280'}18`,
+                  color: STATUS_COLORS[vehicle.status] || '#6B7280',
+                  border: `1px solid ${STATUS_COLORS[vehicle.status] || '#6B7280'}30`,
+                  cursor: 'pointer',
+                  outline: 'none',
+                }}
+              >
+                <option value="AVAILABLE">AVAILABLE</option>
+                <option value="ON_TRIP">ON TRIP</option>
+                <option value="IN_SHOP">IN SHOP</option>
+                <option value="RETIRED">RETIRED</option>
+              </select>
+            ) : (
+              <span style={{ padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 500, backgroundColor: `${color}18`, color, border: `1px solid ${color}30` }}>
+                {vehicle.status.replace('_', ' ')}
+              </span>
+            )}
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
@@ -60,9 +94,9 @@ export default function VehicleDetailPage() {
         {/* Stats */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {[
-            { icon: <Route size={18} />, label: 'Total Trips', value: vehicle._count?.trips || 0, color: '#3B82F6' },
-            { icon: <Wrench size={18} />, label: 'Maintenance Records', value: vehicle._count?.maintenance_logs || 0, color: '#F59E0B' },
-            { icon: <Fuel size={18} />, label: 'Fuel Logs', value: vehicle._count?.fuel_logs || 0, color: '#10B981' },
+            { icon: <Icon icon="mdi:map-marker-distance" width="18" height="18" />, label: 'Total Trips', value: vehicle._count?.trips || 0, color: '#3B82F6' },
+            { icon: <Icon icon="mdi:wrench" width="18" height="18" />, label: 'Maintenance Records', value: vehicle._count?.maintenance_logs || 0, color: '#F59E0B' },
+            { icon: <Icon icon="mdi:gas-station" width="18" height="18" />, label: 'Fuel Logs', value: vehicle._count?.fuel_logs || 0, color: '#10B981' },
           ].map(s => (
             <div key={s.label} style={{ backgroundColor: 'var(--color-bg-primary)', border: '1px solid var(--color-border-default)', borderRadius: 10, padding: 16, display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{ width: 36, height: 36, borderRadius: 8, backgroundColor: `${s.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: s.color }}>{s.icon}</div>

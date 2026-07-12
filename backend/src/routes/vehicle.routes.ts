@@ -18,7 +18,7 @@ router.post(
   '/',
   requireRole('FLEET_MANAGER', 'DISPATCHER'),
   [
-    body('registration_number').notEmpty().withMessage('Registration number is required'),
+    body('registration_number').matches(/^[A-Z]{2}-\d{2}-[A-Z]{1,2}-\d{4}$/i).withMessage('Registration number must be in standard format (e.g. MH-01-AB-1234)'),
     body('name').notEmpty().withMessage('Vehicle name is required'),
     body('type').isIn(['VAN', 'TRUCK', 'BUS', 'OTHER']).withMessage('Invalid vehicle type'),
     body('max_load_capacity').isFloat({ min: 0 }).withMessage('Max load capacity must be a positive number'),

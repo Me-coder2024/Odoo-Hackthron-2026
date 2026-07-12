@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import api from '@/lib/api';
-import { Plus, Search, Users } from 'lucide-react';
+import { Icon } from '@iconify/react';
 
 interface Driver {
   id: string;
@@ -71,8 +71,29 @@ export default function DriversPage() {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
+
+    // Phone validation
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!phoneRegex.test(formData.phone)) {
+      setFormError('Phone number is wrong. It must be exactly 10 digits.');
+      return;
+    }
+
+    // License number validation
+    const licenseRegex = /^[A-Za-z]{2}-\d{2,4}-\d{4,8}$/;
+    if (!licenseRegex.test(formData.license_number)) {
+      setFormError('License number is wrong. It must be in standard format (e.g. DL-2020-001234).');
+      return;
+    }
+
     try {
-      await api.post('/drivers', formData);
+      await api.post('/drivers', {
+        name: formData.name,
+        license_number: formData.license_number,
+        license_expiry: formData.license_expiry,
+        contact_number: formData.phone,
+        license_category: 'HMV',
+      });
       setShowForm(false);
       setFormData({ name: '', license_number: '', license_expiry: '', phone: '' });
       fetchDrivers();
@@ -89,7 +110,7 @@ export default function DriversPage() {
       {/* Filters + Add */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <div style={{ display: 'flex', gap: 10 }}>
-          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ padding: '7px 14px', backgroundColor: '#FFFFFF', border: '1px solid #D1D5DB', borderRadius: 6, color: '#4B5563', fontSize: 13 }}>
+          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ padding: '7px 36px 7px 14px', backgroundColor: '#FFFFFF', border: '1px solid #111827', borderRadius: 6, color: '#4B5563', fontSize: 13 }}>
             <option value="">Status: All</option>
             <option value="ACTIVE">Active</option>
             <option value="ON_TRIP">On Trip</option>
@@ -97,12 +118,12 @@ export default function DriversPage() {
             <option value="OFF_DUTY">Off Duty</option>
           </select>
           <div style={{ position: 'relative' }}>
-            <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
-            <input placeholder="Search driver..." value={search} onChange={e => setSearch(e.target.value)} style={{ padding: '7px 10px 7px 32px', backgroundColor: '#FFFFFF', border: '1px solid #D1D5DB', borderRadius: 6, color: '#111827', fontSize: 13, width: 200, outline: 'none' }} />
+            <Icon icon="mdi:magnify" width="14" height="14" style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
+            <input placeholder="Search driver..." value={search} onChange={e => setSearch(e.target.value)} style={{ padding: '7px 10px 7px 32px', backgroundColor: '#FFFFFF', border: '1px solid #111827', borderRadius: 6, color: '#111827', fontSize: 13, width: 200, outline: 'none' }} />
           </div>
         </div>
-        <button onClick={() => setShowForm(!showForm)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 18px', backgroundColor: '#10B981', color: '#fff', border: 'none', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
-          <Plus size={16} /> Add Driver
+        <button onClick={() => setShowForm(!showForm)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 18px', backgroundColor: '#1542C2', color: '#fff', border: 'none', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+          <Icon icon="mdi:plus" width="16" height="16" /> Add Driver
         </button>
       </div>
 
@@ -112,13 +133,13 @@ export default function DriversPage() {
           <h3 style={{ fontSize: 15, fontWeight: 500, marginBottom: 16, color: '#111827' }}>New Driver</h3>
           {formError && <div style={{ color: '#DC2626', fontSize: 13, marginBottom: 12, padding: '8px 12px', backgroundColor: 'rgba(239,68,68,0.06)', borderRadius: 6 }}>{formError}</div>}
           <form onSubmit={handleCreate} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-            <div><label style={{ fontSize: 11, color: '#6B7280', textTransform: 'uppercase' }}>Name</label><input value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required style={{ marginTop: 4 }} /></div>
-            <div><label style={{ fontSize: 11, color: '#6B7280', textTransform: 'uppercase' }}>License Number</label><input value={formData.license_number} onChange={e => setFormData({...formData, license_number: e.target.value})} required style={{ marginTop: 4 }} /></div>
+            <div><label style={{ fontSize: 11, color: '#6B7280', textTransform: 'uppercase' }}>Name</label><input type="text" placeholder="Ramesh Kumar" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required style={{ marginTop: 4 }} /></div>
+            <div><label style={{ fontSize: 11, color: '#6B7280', textTransform: 'uppercase' }}>License Number</label><input type="text" placeholder="GJ-0120150012345" value={formData.license_number} onChange={e => setFormData({...formData, license_number: e.target.value})} required style={{ marginTop: 4 }} /></div>
             <div><label style={{ fontSize: 11, color: '#6B7280', textTransform: 'uppercase' }}>License Expiry</label><input type="date" value={formData.license_expiry} onChange={e => setFormData({...formData, license_expiry: e.target.value})} required style={{ marginTop: 4 }} /></div>
-            <div><label style={{ fontSize: 11, color: '#6B7280', textTransform: 'uppercase' }}>Phone</label><input value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} required style={{ marginTop: 4 }} /></div>
+            <div><label style={{ fontSize: 11, color: '#6B7280', textTransform: 'uppercase' }}>Phone</label><input type="text" placeholder="+91 98765 43210" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} required style={{ marginTop: 4 }} /></div>
             <div style={{ gridColumn: 'span 2', display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 8 }}>
-              <button type="button" onClick={() => setShowForm(false)} style={{ padding: '8px 16px', backgroundColor: '#FFFFFF', color: '#6B7280', border: '1px solid #D1D5DB', borderRadius: 6, cursor: 'pointer', fontSize: 13 }}>Cancel</button>
-              <button type="submit" style={{ padding: '8px 16px', backgroundColor: '#10B981', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>Create Driver</button>
+              <button type="button" onClick={() => setShowForm(false)} style={{ padding: '8px 16px', backgroundColor: '#FFFFFF', color: '#6B7280', border: '1px solid #111827', borderRadius: 6, cursor: 'pointer', fontSize: 13 }}>Cancel</button>
+              <button type="submit" style={{ padding: '8px 16px', backgroundColor: '#1542C2', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>Create Driver</button>
             </div>
           </form>
         </div>
@@ -129,7 +150,7 @@ export default function DriversPage() {
         {loading ? (
           <div style={{ padding: 20 }}>{[1,2,3,4].map(i => <div key={i} className="skeleton" style={{ height: 44, marginBottom: 6, borderRadius: 4 }} />)}</div>
         ) : drivers.length === 0 ? (
-          <div style={{ padding: 60, textAlign: 'center' }}><Users size={36} style={{ color: '#D1D5DB', marginBottom: 10 }} /><p style={{ color: '#6B7280', fontSize: 13 }}>No drivers found</p></div>
+          <div style={{ padding: 60, textAlign: 'center' }}><Icon icon="mdi:account-group" width="36" height="36" style={{ color: '#D1D5DB', marginBottom: 10 }} /><p style={{ color: '#6B7280', fontSize: 13 }}>No drivers found</p></div>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
@@ -161,7 +182,7 @@ export default function DriversPage() {
         )}
       </div>
 
-      <p style={{ marginTop: 16, fontSize: 12, color: '#E67E00', fontStyle: 'italic' }}>
+      <p style={{ marginTop: 16, fontSize: 12, color: '#1542C2', fontStyle: 'italic' }}>
         Only safety officers can update driver profiles & safety scores
       </p>
     </div>

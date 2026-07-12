@@ -3,17 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/hooks/useAuth';
-import {
-  LayoutDashboard,
-  Truck,
-  Route,
-  Users,
-  Wrench,
-  Fuel,
-  BarChart3,
-  Settings,
-  LogOut,
-} from 'lucide-react';
+import { Icon } from '@iconify/react';
 
 interface NavItem {
   label: string;
@@ -26,54 +16,59 @@ const NAV_ITEMS: NavItem[] = [
   {
     label: 'Dashboard',
     href: '/dashboard',
-    icon: <LayoutDashboard size={18} />,
+    icon: <Icon icon="mdi:view-dashboard" width="18" height="18" />,
     roles: ['FLEET_MANAGER', 'DISPATCHER', 'SAFETY_OFFICER', 'FINANCIAL_ANALYST'],
   },
   {
     label: 'Fleet',
     href: '/vehicles',
-    icon: <Truck size={18} />,
+    icon: <Icon icon="mdi:truck" width="18" height="18" />,
     roles: ['FLEET_MANAGER', 'DISPATCHER', 'SAFETY_OFFICER', 'FINANCIAL_ANALYST'],
   },
   {
     label: 'Drivers',
     href: '/drivers',
-    icon: <Users size={18} />,
+    icon: <Icon icon="mdi:account-group" width="18" height="18" />,
     roles: ['FLEET_MANAGER', 'SAFETY_OFFICER', 'DISPATCHER'],
   },
   {
     label: 'Trips',
     href: '/trips',
-    icon: <Route size={18} />,
+    icon: <Icon icon="mdi:map-marker-distance" width="18" height="18" />,
     roles: ['FLEET_MANAGER', 'DISPATCHER', 'SAFETY_OFFICER', 'FINANCIAL_ANALYST'],
   },
   {
     label: 'Maintenance',
     href: '/maintenance',
-    icon: <Wrench size={18} />,
+    icon: <Icon icon="mdi:wrench" width="18" height="18" />,
     roles: ['FLEET_MANAGER', 'SAFETY_OFFICER'],
   },
   {
     label: 'Fuel & Expenses',
     href: '/fuel-expenses',
-    icon: <Fuel size={18} />,
+    icon: <Icon icon="mdi:gas-station" width="18" height="18" />,
     roles: ['FLEET_MANAGER', 'FINANCIAL_ANALYST', 'DISPATCHER'],
   },
   {
     label: 'Analytics',
     href: '/analytics',
-    icon: <BarChart3 size={18} />,
+    icon: <Icon icon="mdi:chart-bar" width="18" height="18" />,
     roles: ['FLEET_MANAGER', 'FINANCIAL_ANALYST', 'DISPATCHER', 'SAFETY_OFFICER'],
   },
   {
     label: 'Settings',
     href: '/settings',
-    icon: <Settings size={18} />,
+    icon: <Icon icon="mdi:cog" width="18" height="18" />,
     roles: ['FLEET_MANAGER'],
   },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  isOpen?: boolean;
+  onClose?: () => void;
+}
+
+export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
   const { user, logout } = useAuthStore();
 
@@ -82,6 +77,7 @@ export function Sidebar() {
 
   return (
     <aside
+      className={`sidebar-responsive ${isOpen ? 'open' : ''}`}
       style={{
         width: 200,
         minHeight: '100vh',
@@ -98,8 +94,14 @@ export function Sidebar() {
       {/* Brand */}
       <div
         style={{
-          padding: '20px 20px 16px',
+          height: 60,
+          padding: '0 20px',
           borderBottom: '1px solid rgba(255,255,255,0.1)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexShrink: 0,
+          width: '100%',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -108,18 +110,33 @@ export function Sidebar() {
               width: 28,
               height: 28,
               borderRadius: 6,
-              backgroundColor: '#E67E00',
+              backgroundColor: '#FFFFFF',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <Truck size={15} color="#fff" />
+            <Icon icon="mdi:truck" width="16" height="16" color="#1542C2" />
           </div>
           <span style={{ fontSize: 16, fontWeight: 700, color: '#FFFFFF', letterSpacing: '-0.01em' }}>
             TransitOps
           </span>
         </div>
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="hamburger-btn"
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: '#FFFFFF',
+              padding: 4,
+            }}
+          >
+            <Icon icon="mdi:close" width="20" height="20" />
+          </button>
+        )}
       </div>
 
       {/* Navigation */}
@@ -142,7 +159,7 @@ export function Sidebar() {
                 backgroundColor: isActive ? 'rgba(255,255,255,0.15)' : 'transparent',
                 textDecoration: 'none',
                 transition: 'all 0.15s ease',
-                borderLeft: isActive ? '3px solid #E67E00' : '3px solid transparent',
+                borderLeft: isActive ? '3px solid #FFFFFF' : '3px solid transparent',
               }}
               onMouseEnter={(e) => {
                 if (!isActive) {
@@ -191,7 +208,7 @@ export function Sidebar() {
             (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.75)';
           }}
         >
-          <LogOut size={18} />
+          <Icon icon="mdi:logout" width="18" height="18" />
           <span>Logout</span>
         </button>
       </div>

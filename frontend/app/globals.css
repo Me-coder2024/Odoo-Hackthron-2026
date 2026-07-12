@@ -16,11 +16,11 @@
   --color-border-default: #E5E7EB;
   --color-border-subtle: #F3F4F6;
 
-  /* Accent — Orange #E67E00 */
-  --color-accent: #E67E00;
-  --color-accent-hover: #CC6F00;
-  --color-accent-light: #FFF3E0;
-  --color-accent-muted: rgba(230, 126, 0, 0.15);
+  /* Accent — Blue #1542C2 */
+  --color-accent: #1542C2;
+  --color-accent-hover: #10349A;
+  --color-accent-light: #EBF0FF;
+  --color-accent-muted: rgba(21, 66, 194, 0.15);
 
   /* Sidebar */
   --color-sidebar: #1542C2;
@@ -128,15 +128,12 @@ input, select, textarea {
   font-family: inherit;
 }
 
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="number"],
-input[type="date"],
+input:not([type="checkbox"]):not([type="radio"]),
+input:not([type]),
 select,
 textarea {
   background-color: #FFFFFF;
-  border: 1px solid #D1D5DB;
+  border: 1px solid #111827;
   color: #111827;
   padding: 10px 14px;
   border-radius: 6px;
@@ -187,3 +184,84 @@ select {
   padding-right: 36px;
   cursor: pointer;
 }
+
+/* Layout Utilities (Desktop Only) */
+
+.sidebar-responsive {
+  /* Keep desktop sidebar always in position */
+}
+
+.two-col-equal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.two-one-col-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+.two-col-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 20px;
+}
+
+.dashboard-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+}
+
+.analytics-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.three-col-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+}
+
+.two-col-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.four-col-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 12px;
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 32px;
+}
+
+.flex-wrap-responsive {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.hamburger-btn {
+  display: none;
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+
+

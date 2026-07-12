@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/hooks/useAuth';
-import { AlertCircle } from 'lucide-react';
 import { Icon } from '@iconify/react';
 
 export default function LoginPage() {
@@ -18,6 +17,13 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    const trimmedUser = username.trim().toLowerCase();
+    if (trimmedUser.includes('@') && !trimmedUser.endsWith('@transitops.com')) {
+      setError('Email must be from the @transitops.com domain');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -125,7 +131,7 @@ export default function LoginPage() {
                 color: '#DC2626',
               }}
             >
-              <AlertCircle size={14} />
+              <Icon icon="mdi:alert-circle" width="14" height="14" />
               {error}
             </div>
           )}
@@ -141,15 +147,15 @@ export default function LoginPage() {
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Raven@transitops.."
+                placeholder="dispatch@transitops.com"
                 required
                 autoFocus
                 disabled={isSubmitting}
                 style={{
                   width: '100%',
-                  padding: '8px 12px',
+                  padding: '8px 36px 8px 12px',
                   backgroundColor: '#FFFFFF',
-                  border: '1px solid #D1D5DB',
+                  border: '1px solid #111827',
                   borderRadius: 6,
                   color: '#111827',
                   fontSize: 13,
@@ -175,7 +181,7 @@ export default function LoginPage() {
                   width: '100%',
                   padding: '8px 12px',
                   backgroundColor: '#FFFFFF',
-                  border: '1px solid #D1D5DB',
+                  border: '1px solid #111827',
                   borderRadius: 6,
                   color: '#111827',
                   fontSize: 13,
@@ -196,7 +202,7 @@ export default function LoginPage() {
                   width: '100%',
                   padding: '8px 12px',
                   backgroundColor: '#FFFFFF',
-                  border: '1px solid #D1D5DB',
+                  border: '1px solid #111827',
                   borderRadius: 6,
                   color: '#111827',
                   fontSize: 13,
@@ -267,10 +273,10 @@ export default function LoginPage() {
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px 10px' }}>
               {[
-                { user: 'fleet_manager', role: 'Fleet Manager' },
-                { user: 'dispatcher', role: 'Dispatcher' },
-                { user: 'safety_officer', role: 'Safety Officer' },
-                { user: 'financial_analyst', role: 'Analyst' },
+                { user: 'fleet@transitops.com', role: 'Fleet Manager' },
+                { user: 'dispatch@transitops.com', role: 'Dispatcher' },
+                { user: 'safety@transitops.com', role: 'Safety Officer' },
+                { user: 'finance@transitops.com', role: 'Analyst' },
               ].map((cred) => (
                 <button
                   key={cred.user}

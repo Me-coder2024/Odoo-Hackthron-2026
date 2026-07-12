@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import api from '@/lib/api';
-import { Route } from 'lucide-react';
+import { Icon } from '@iconify/react';
 
 const STATUS_BG: Record<string, string> = {
   DRAFT: '#4B5563',
@@ -72,22 +72,30 @@ export default function TripsPage() {
   };
 
   const handleDispatch = async (tripId: string) => {
-    try { await api.post(`/trips/${tripId}/dispatch`); fetchTrips(); } catch (err) { console.error(err); }
+    try {
+      await api.post(`/trips/${tripId}/dispatch`);
+      fetchTrips();
+    } catch (err: any) {
+      const errMsg = err.response?.data?.message || 'Failed to dispatch trip';
+      console.warn('Dispatch failed:', errMsg);
+      alert(errMsg);
+    }
   };
 
   const selectedVehicle = vehicles.find(v => v.id === formData.vehicle_id);
   const cargoExceeds = selectedVehicle && formData.cargo_weight && parseFloat(formData.cargo_weight) > Number(selectedVehicle.max_load_capacity);
   const exceededBy = cargoExceeds ? parseFloat(formData.cargo_weight) - Number(selectedVehicle.max_load_capacity) : 0;
 
-  const inputStyle: React.CSSProperties = { width: '100%', padding: '10px 14px', backgroundColor: '#FFFFFF', border: '1px solid #D1D5DB', borderRadius: 6, color: '#111827', fontSize: 14, outline: 'none', marginTop: 4 };
+  const inputStyle: React.CSSProperties = { width: '100%', padding: '10px 14px', backgroundColor: '#FFFFFF', border: '1px solid #111827', borderRadius: 6, color: '#111827', fontSize: 14, outline: 'none', marginTop: 4 };
+  const selectStyle: React.CSSProperties = { ...inputStyle, padding: '10px 36px 10px 14px' };
   const labelStyle: React.CSSProperties = { fontSize: 10, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600, marginBottom: 2 };
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, height: 'calc(100vh - 108px)', minHeight: 0, overflow: 'hidden' }}>
       {/* LEFT — Trip Lifecycle + Create Form */}
-      <div>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, overflow: 'hidden' }}>
         {/* Trip Lifecycle Stepper */}
-        <div style={{ marginBottom: 24 }}>
+        <div style={{ marginBottom: 20, flexShrink: 0 }}>
           <div style={{ fontSize: 10, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>TRIP LIFECYCLE</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
             {LIFECYCLE_STEPS.map((step, i) => {
@@ -109,62 +117,62 @@ export default function TripsPage() {
         </div>
 
         {/* Create Trip Form */}
-        <div>
-          <div style={{ fontSize: 13, fontWeight: 600, color: '#4B5563', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 16 }}>CREATE TRIP</div>
-          <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <div>
+        <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: '#4B5563', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12, flexShrink: 0 }}>CREATE TRIP</div>
+          <form onSubmit={handleCreate} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, overflowY: 'auto', paddingRight: 4 }}>
+            <div style={{ gridColumn: 'span 2' }}>
               <label style={labelStyle}>SOURCE</label>
-              <input value={formData.source} onChange={e => setFormData({...formData, source: e.target.value})} required style={inputStyle} placeholder="Gandhinagar Depot" />
+              <input type="text" value={formData.source} onChange={e => setFormData({...formData, source: e.target.value})} required style={inputStyle} placeholder="Gandhinagar Depot" />
             </div>
-            <div>
+            <div style={{ gridColumn: 'span 2' }}>
               <label style={labelStyle}>DESTINATION</label>
-              <input value={formData.destination} onChange={e => setFormData({...formData, destination: e.target.value})} required style={inputStyle} placeholder="Ahmedabad Hub" />
+              <input type="text" value={formData.destination} onChange={e => setFormData({...formData, destination: e.target.value})} required style={inputStyle} placeholder="Ahmedabad Hub" />
             </div>
             <div>
               <label style={labelStyle}>VEHICLE (AVAILABLE ONLY)</label>
-              <select value={formData.vehicle_id} onChange={e => setFormData({...formData, vehicle_id: e.target.value})} required style={inputStyle}>
+              <select value={formData.vehicle_id} onChange={e => setFormData({...formData, vehicle_id: e.target.value})} required style={selectStyle}>
                 <option value="">Select vehicle</option>
                 {vehicles.map(v => <option key={v.id} value={v.id}>{v.registration_number} — {Number(v.max_load_capacity).toLocaleString()} kg capacity</option>)}
               </select>
             </div>
             <div>
               <label style={labelStyle}>DRIVER (AVAILABLE ONLY)</label>
-              <select value={formData.driver_id} onChange={e => setFormData({...formData, driver_id: e.target.value})} required style={inputStyle}>
+              <select value={formData.driver_id} onChange={e => setFormData({...formData, driver_id: e.target.value})} required style={selectStyle}>
                 <option value="">Select driver</option>
                 {drivers.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
               </select>
             </div>
             <div>
               <label style={labelStyle}>CARGO WEIGHT (KG)</label>
-              <input type="number" value={formData.cargo_weight} onChange={e => setFormData({...formData, cargo_weight: e.target.value})} required style={inputStyle} />
+              <input type="number" placeholder="5000" value={formData.cargo_weight} onChange={e => setFormData({...formData, cargo_weight: e.target.value})} required style={inputStyle} />
             </div>
             <div>
               <label style={labelStyle}>PLANNED DISTANCE (KM)</label>
-              <input type="number" value={formData.planned_distance} onChange={e => setFormData({...formData, planned_distance: e.target.value})} required style={inputStyle} />
+              <input type="number" placeholder="350" value={formData.planned_distance} onChange={e => setFormData({...formData, planned_distance: e.target.value})} required style={inputStyle} />
             </div>
 
             {/* Capacity Warning */}
             {cargoExceeds && (
-              <div style={{ backgroundColor: 'rgba(220,38,38,0.06)', border: '1px solid rgba(220,38,38,0.2)', borderRadius: 6, padding: '10px 14px', marginTop: 4 }}>
+              <div style={{ gridColumn: 'span 2', backgroundColor: 'rgba(220,38,38,0.06)', border: '1px solid rgba(220,38,38,0.2)', borderRadius: 6, padding: '10px 14px', marginTop: 4 }}>
                 <div style={{ fontSize: 12, color: '#DC2626' }}>Vehicle Capacity: {Number(selectedVehicle.max_load_capacity).toLocaleString()} kg</div>
                 <div style={{ fontSize: 12, color: '#DC2626' }}>Cargo Weight: {parseFloat(formData.cargo_weight).toLocaleString()} kg</div>
                 <div style={{ fontSize: 12, color: '#EF4444', fontWeight: 600, marginTop: 4 }}>✕ Capacity exceeded by {exceededBy.toLocaleString()} kg — dispatch blocked</div>
               </div>
             )}
 
-            {formError && <div style={{ color: '#DC2626', fontSize: 13, padding: '8px 12px', backgroundColor: 'rgba(239,68,68,0.06)', borderRadius: 6 }}>{formError}</div>}
+            {formError && <div style={{ gridColumn: 'span 2', color: '#DC2626', fontSize: 13, padding: '8px 12px', backgroundColor: 'rgba(239,68,68,0.06)', borderRadius: 6 }}>{formError}</div>}
 
-            <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
+            <div style={{ gridColumn: 'span 2', display: 'flex', gap: 10, marginTop: 8 }}>
               <button type="submit" disabled={!!cargoExceeds} style={{
-                flex: 1, padding: '10px 16px', backgroundColor: cargoExceeds ? '#E5E7EB' : '#E67E00',
+                flex: 1, padding: '10px 16px', backgroundColor: cargoExceeds ? '#E5E7EB' : '#1542C2',
                 color: cargoExceeds ? '#9CA3AF' : '#fff', border: '1px solid #D1D5DB', borderRadius: 6,
                 fontSize: 13, fontWeight: 600, cursor: cargoExceeds ? 'not-allowed' : 'pointer',
               }}>
                 {cargoExceeds ? 'Dispatch (disabled)' : 'Create & Dispatch'}
               </button>
               <button type="button" onClick={() => setFormData({ source: '', destination: '', vehicle_id: '', driver_id: '', cargo_weight: '', planned_distance: '' })} style={{
-                padding: '10px 24px', backgroundColor: '#FFFFFF', color: '#E67E00',
-                border: '1px solid #E67E00', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                padding: '10px 24px', backgroundColor: '#FFFFFF', color: '#1542C2',
+                border: '1px solid #1542C2', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer',
               }}>
                 Cancel
               </button>
@@ -174,18 +182,18 @@ export default function TripsPage() {
       </div>
 
       {/* RIGHT — Live Board */}
-      <div>
-        <div style={{ fontSize: 13, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 16 }}>LIVE BOARD</div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, overflow: 'hidden' }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 16, flexShrink: 0 }}>LIVE BOARD</div>
+        <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 12, paddingRight: 4 }}>
           {loading ? (
             [1,2,3].map(i => <div key={i} className="skeleton" style={{ height: 90, borderRadius: 8 }} />)
           ) : trips.length === 0 ? (
             <div style={{ padding: 40, textAlign: 'center', color: '#6B7280', fontSize: 13 }}>
-              <Route size={28} style={{ color: '#D1D5DB', marginBottom: 8 }} />
+              <Icon icon="mdi:map-marker-distance" width="28" height="28" style={{ color: '#D1D5DB', marginBottom: 8 }} />
               <p>No trips yet</p>
             </div>
           ) : (
-            trips.slice(0, 8).map(t => (
+            trips.map(t => (
               <div key={t.id} style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 8, padding: '14px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
                   <span style={{ fontSize: 14, fontWeight: 600, color: '#111827', fontFamily: 'monospace' }}>{t.trip_number}</span>
@@ -201,13 +209,13 @@ export default function TripsPage() {
                   </span>
                 </div>
                 {t.status === 'DRAFT' && (
-                  <button onClick={() => handleDispatch(t.id)} style={{ marginTop: 8, padding: '5px 14px', backgroundColor: '#3B82F6', color: '#fff', border: 'none', borderRadius: 4, fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>Dispatch Now</button>
+                  <button onClick={() => handleDispatch(t.id)} style={{ marginTop: 8, padding: '5px 14px', backgroundColor: '#1542C2', color: '#fff', border: 'none', borderRadius: 4, fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>Dispatch Now</button>
                 )}
               </div>
             ))
           )}
         </div>
-        <p style={{ marginTop: 16, fontSize: 11, color: '#6B7280', fontStyle: 'italic' }}>
+        <p style={{ marginTop: 16, fontSize: 11, color: '#6B7280', fontStyle: 'italic', flexShrink: 0 }}>
           On complete: odometer → fuel log → expenses → Vehicle & Driver Available
         </p>
       </div>

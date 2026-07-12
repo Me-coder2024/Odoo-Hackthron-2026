@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/hooks/useAuth';
 import { Sidebar } from '@/components/shared/Sidebar';
-import { Search } from 'lucide-react';
+import { Icon } from '@iconify/react';
 
 const ROLE_LABELS: Record<string, string> = {
   FLEET_MANAGER: 'Fleet Mgr',
@@ -14,7 +14,7 @@ const ROLE_LABELS: Record<string, string> = {
 };
 
 const ROLE_BADGE_COLORS: Record<string, string> = {
-  FLEET_MANAGER: '#E67E00',
+  FLEET_MANAGER: '#1542C2',
   DISPATCHER: '#3B82F6',
   SAFETY_OFFICER: '#10B981',
   FINANCIAL_ANALYST: '#8B5CF6',
@@ -24,6 +24,11 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading, isAuthenticated, checkAuth } = useAuthStore();
   const pathname = usePathname();
   const router = useRouter();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    setIsSidebarOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     checkAuth();
@@ -83,12 +88,23 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
-      <Sidebar />
-      <div style={{ flex: 1, marginLeft: 200, display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      {isSidebarOpen && (
+        <div
+          onClick={() => setIsSidebarOpen(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.4)',
+            zIndex: 35,
+          }}
+        />
+      )}
+      <div className="content-responsive" style={{ flex: 1, marginLeft: 200, display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
         {/* Top Header Bar */}
         <header
           style={{
-            height: 52,
+            height: 60,
             backgroundColor: '#FFFFFF',
             borderBottom: '1px solid #E5E7EB',
             display: 'flex',
@@ -98,22 +114,38 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
             flexShrink: 0,
           }}
         >
-          {/* Search */}
-          <div style={{ position: 'relative', width: 240 }}>
-            <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
-            <input
-              placeholder="Search..."
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <button
+              className="hamburger-btn"
+              onClick={() => setIsSidebarOpen(true)}
               style={{
-                width: '100%',
-                padding: '7px 10px 7px 32px',
-                backgroundColor: '#F3F4F6',
-                border: '1px solid #E5E7EB',
-                borderRadius: 6,
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: 4,
                 color: '#111827',
-                fontSize: 13,
-                outline: 'none',
               }}
-            />
+            >
+              <Icon icon="mdi:menu" width="24" height="24" />
+            </button>
+            {/* Search */}
+            <div className="header-search" style={{ position: 'relative', width: 240 }}>
+              <Icon icon="mdi:magnify" width="14" height="14" style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
+              <input
+                type="text"
+                placeholder="Search..."
+                style={{
+                  width: '100%',
+                  padding: '7px 10px 7px 32px',
+                  backgroundColor: '#F3F4F6',
+                  border: '1px solid #E5E7EB',
+                  borderRadius: 6,
+                  color: '#111827',
+                  fontSize: 13,
+                  outline: 'none',
+                }}
+              />
+            </div>
           </div>
 
           {/* User info + role badge */}

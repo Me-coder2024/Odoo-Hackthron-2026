@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import api from '@/lib/api';
-import { ArrowLeft, Plus, CheckCircle } from 'lucide-react';
+import { Icon } from '@iconify/react';
 
 export default function MaintenanceDetailPage() {
   const { id } = useParams();
@@ -38,7 +38,7 @@ export default function MaintenanceDetailPage() {
 
   return (
     <div>
-      <button onClick={() => router.back()} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', marginBottom: 20, fontSize: 13 }}><ArrowLeft size={16} /> Back</button>
+      <button onClick={() => router.back()} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', marginBottom: 20, fontSize: 13 }}><Icon icon="mdi:arrow-left" width="16" height="16" /> Back</button>
 
       {error && <div style={{ color: '#EF4444', fontSize: 13, marginBottom: 16, padding: '10px 14px', backgroundColor: 'rgba(239,68,68,0.1)', borderRadius: 8 }}>{error}</div>}
 
@@ -59,8 +59,8 @@ export default function MaintenanceDetailPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {isActive && (
             <>
-              <button onClick={() => setShowAddItem(true)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 20px', backgroundColor: 'var(--color-accent)', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 500, cursor: 'pointer' }}><Plus size={16} /> Add Item</button>
-              <button onClick={handleClose} disabled={actionLoading} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 20px', backgroundColor: '#10B981', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 500, cursor: 'pointer' }}><CheckCircle size={16} /> {actionLoading ? 'Closing...' : 'Close & Restore Vehicle'}</button>
+              <button onClick={() => setShowAddItem(true)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 20px', backgroundColor: 'var(--color-accent)', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 500, cursor: 'pointer' }}><Icon icon="mdi:plus" width="16" height="16" /> Add Item</button>
+              <button onClick={handleClose} disabled={actionLoading} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 20px', backgroundColor: '#10B981', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 500, cursor: 'pointer' }}><Icon icon="mdi:check-circle" width="16" height="16" /> {actionLoading ? 'Closing...' : 'Close & Restore Vehicle'}</button>
             </>
           )}
         </div>
@@ -69,8 +69,8 @@ export default function MaintenanceDetailPage() {
       {showAddItem && (
         <div style={{ backgroundColor: 'var(--color-bg-primary)', border: '1px solid var(--color-border-default)', borderRadius: 10, padding: 24, marginBottom: 24 }}>
           <form onSubmit={handleAddItem} style={{ display: 'flex', gap: 12, alignItems: 'flex-end' }}>
-            <div style={{ flex: 2 }}><label>Description</label><input value={itemData.description} onChange={e => setItemData({...itemData, description: e.target.value})} required /></div>
-            <div style={{ flex: 1 }}><label>Cost (₹)</label><input type="number" value={itemData.cost} onChange={e => setItemData({...itemData, cost: e.target.value})} required /></div>
+            <div style={{ flex: 2 }}><label>Description</label><input type="text" placeholder="Engine Oil Change" style={{ border: '1px solid #111827', width: '100%', padding: '10px 14px', backgroundColor: '#FFFFFF', borderRadius: 6, color: '#111827', fontSize: 14, outline: 'none', marginTop: 4 }} value={itemData.description} onChange={e => setItemData({...itemData, description: e.target.value})} required /></div>
+            <div style={{ flex: 1 }}><label>Cost (₹)</label><input type="number" placeholder="3500" style={{ border: '1px solid #111827', width: '100%', padding: '10px 14px', backgroundColor: '#FFFFFF', borderRadius: 6, color: '#111827', fontSize: 14, outline: 'none', marginTop: 4 }} value={itemData.cost} onChange={e => setItemData({...itemData, cost: e.target.value})} required /></div>
             <button type="submit" style={{ padding: '8px 16px', backgroundColor: 'var(--color-accent)', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 13, fontWeight: 500, marginBottom: 1 }}>Add</button>
           </form>
         </div>

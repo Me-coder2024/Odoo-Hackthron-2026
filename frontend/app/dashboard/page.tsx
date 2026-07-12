@@ -99,7 +99,7 @@ export default function DashboardPage() {
     { label: 'ACTIVE TRIPS', value: kpis?.trips.active || 0, border: '#3B82F6' },
     { label: 'PENDING TRIPS', value: (kpis?.trips.total || 0) - (kpis?.trips.active || 0) - (kpis?.trips.completed || 0), border: '#8B5CF6' },
     { label: 'DRIVERS ON DUTY', value: kpis?.drivers.total || 0, border: '#10B981' },
-    { label: 'FLEET UTILIZATION', value: `${fleetUtil?.utilization_percent || 0}%`, border: '#E67E00' },
+    { label: 'FLEET UTILIZATION', value: `${fleetUtil?.utilization_percent || 0}%`, border: '#1542C2' },
   ];
 
   const vehicleStatusItems = fleetUtil?.breakdown || [];
@@ -110,25 +110,25 @@ export default function DashboardPage() {
       {/* Filters row */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
         <span style={{ fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.06em' }}>FILTERS</span>
-        <select style={{ padding: '6px 12px', backgroundColor: '#FFFFFF', border: '1px solid #D1D5DB', borderRadius: 6, color: '#4B5563', fontSize: 13 }}>
+        <select style={{ padding: '6px 36px 6px 12px', backgroundColor: '#FFFFFF', border: '1px solid #111827', borderRadius: 6, color: '#4B5563', fontSize: 13 }}>
           <option>Vehicle Type: All</option>
           <option>Van</option>
           <option>Truck</option>
           <option>Bus</option>
         </select>
-        <select style={{ padding: '6px 12px', backgroundColor: '#FFFFFF', border: '1px solid #D1D5DB', borderRadius: 6, color: '#4B5563', fontSize: 13 }}>
+        <select style={{ padding: '6px 36px 6px 12px', backgroundColor: '#FFFFFF', border: '1px solid #111827', borderRadius: 6, color: '#4B5563', fontSize: 13 }}>
           <option>Status: All</option>
           <option>Available</option>
           <option>On Trip</option>
           <option>In Shop</option>
         </select>
-        <select style={{ padding: '6px 12px', backgroundColor: '#FFFFFF', border: '1px solid #D1D5DB', borderRadius: 6, color: '#4B5563', fontSize: 13 }}>
+        <select style={{ padding: '6px 36px 6px 12px', backgroundColor: '#FFFFFF', border: '1px solid #111827', borderRadius: 6, color: '#4B5563', fontSize: 13 }}>
           <option>Region: All</option>
         </select>
       </div>
 
       {/* KPI Cards — 7 across */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 10, marginBottom: 28 }}>
+      <div className="dashboard-kpi-grid" style={{ marginBottom: 28 }}>
         {kpiCards.map((card) => (
           <div
             key={card.label}
@@ -152,47 +152,49 @@ export default function DashboardPage() {
       </div>
 
       {/* Two columns: Recent Trips + Vehicle Status */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 20 }}>
+      <div className="two-col-grid">
         {/* Recent Trips */}
         <div>
           <h3 style={{ fontSize: 13, fontWeight: 600, color: '#4B5563', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 14 }}>RECENT TRIPS</h3>
           <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 8, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid #E5E7EB' }}>
-                  {['TRIP', 'VEHICLE', 'DRIVER', 'STATUS', 'ETA'].map((h) => (
-                    <th key={h} style={{ padding: '10px 14px', fontSize: 10, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', textAlign: 'left', letterSpacing: '0.06em' }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {recentTrips.length > 0 ? recentTrips.map((trip) => (
-                  <tr key={trip.id} style={{ borderBottom: '1px solid #F3F4F6' }}>
-                    <td style={{ padding: '10px 14px', fontSize: 13, color: '#111827', fontFamily: 'monospace' }}>{trip.trip_number}</td>
-                    <td style={{ padding: '10px 14px', fontSize: 13, color: '#4B5563' }}>{trip.vehicle?.name || '—'}</td>
-                    <td style={{ padding: '10px 14px', fontSize: 13, color: '#4B5563' }}>{trip.driver?.name || '—'}</td>
-                    <td style={{ padding: '10px 14px' }}>
-                      <span style={{
-                        display: 'inline-block',
-                        padding: '3px 10px',
-                        borderRadius: 4,
-                        fontSize: 11,
-                        fontWeight: 600,
-                        color: '#fff',
-                        backgroundColor: STATUS_BG[trip.status] || '#374151',
-                      }}>
-                        {trip.status === 'DISPATCHED' ? 'On Trip' : trip.status.charAt(0) + trip.status.slice(1).toLowerCase()}
-                      </span>
-                    </td>
-                    <td style={{ padding: '10px 14px', fontSize: 13, color: '#6B7280' }}>
-                      {trip.status === 'DISPATCHED' ? '~45 min' : trip.status === 'COMPLETED' ? '—' : 'Awaiting vehicle'}
-                    </td>
+            <div className="table-container">
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid #E5E7EB' }}>
+                    {['TRIP', 'VEHICLE', 'DRIVER', 'STATUS', 'ETA'].map((h) => (
+                      <th key={h} style={{ padding: '10px 14px', fontSize: 10, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', textAlign: 'left', letterSpacing: '0.06em' }}>{h}</th>
+                    ))}
                   </tr>
-                )) : (
-                  <tr><td colSpan={5} style={{ padding: 24, textAlign: 'center', color: '#6B7280', fontSize: 13 }}>No recent trips</td></tr>
-                )}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {recentTrips.length > 0 ? recentTrips.map((trip) => (
+                    <tr key={trip.id} style={{ borderBottom: '1px solid #F3F4F6' }}>
+                      <td style={{ padding: '10px 14px', fontSize: 13, color: '#111827', fontFamily: 'monospace' }}>{trip.trip_number}</td>
+                      <td style={{ padding: '10px 14px', fontSize: 13, color: '#4B5563' }}>{trip.vehicle?.name || '—'}</td>
+                      <td style={{ padding: '10px 14px', fontSize: 13, color: '#4B5563' }}>{trip.driver?.name || '—'}</td>
+                      <td style={{ padding: '10px 14px' }}>
+                        <span style={{
+                          display: 'inline-block',
+                          padding: '3px 10px',
+                          borderRadius: 4,
+                          fontSize: 11,
+                          fontWeight: 600,
+                          color: '#fff',
+                          backgroundColor: STATUS_BG[trip.status] || '#374151',
+                        }}>
+                          {trip.status === 'DISPATCHED' ? 'On Trip' : trip.status.charAt(0) + trip.status.slice(1).toLowerCase()}
+                        </span>
+                      </td>
+                      <td style={{ padding: '10px 14px', fontSize: 13, color: '#6B7280' }}>
+                        {trip.status === 'DISPATCHED' ? '~45 min' : trip.status === 'COMPLETED' ? '—' : 'Awaiting vehicle'}
+                      </td>
+                    </tr>
+                  )) : (
+                    <tr><td colSpan={5} style={{ padding: 24, textAlign: 'center', color: '#6B7280', fontSize: 13 }}>No recent trips</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 

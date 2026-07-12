@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
-import { Download } from 'lucide-react';
+import { Icon } from '@iconify/react';
 
 export default function AnalyticsPage() {
   const [kpis, setKpis] = useState<any>(null);
@@ -50,7 +50,7 @@ export default function AnalyticsPage() {
   const maxCost = costliestVehicles.length > 0 ? costliestVehicles[0].total_operational_cost : 1;
 
   // Bar colors for top costliest
-  const barColors = ['#EF4444', '#E67E00', '#3B82F6', '#10B981', '#8B5CF6'];
+  const barColors = ['#EF4444', '#0EA5E9', '#3B82F6', '#10B981', '#8B5CF6'];
 
   // Average ROI
   const avgRoi = roi?.vehicles?.length > 0
@@ -69,7 +69,7 @@ export default function AnalyticsPage() {
           <div style={{ fontSize: 9, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>FLEET UTILIZATION</div>
           <div style={{ fontSize: 28, fontWeight: 700, color: '#111827' }}>{fleetUtil?.utilization_percent || 0}%</div>
         </div>
-        <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderTop: '3px solid #E67E00', borderRadius: 8, padding: '14px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
+        <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderTop: '3px solid #1542C2', borderRadius: 8, padding: '14px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
           <div style={{ fontSize: 9, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>OPERATIONAL COST</div>
           <div style={{ fontSize: 28, fontWeight: 700, color: '#111827' }}>{opCost ? opCost.total_operational_cost.toLocaleString() : '—'}</div>
         </div>
@@ -148,7 +148,7 @@ export default function AnalyticsPage() {
       <div style={{ display: 'flex', gap: 8, marginTop: 20 }}>
         {['vehicles', 'trips', 'fuel-logs', 'expenses'].map(type => (
           <button key={type} onClick={() => handleExport(type)} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 14px', backgroundColor: '#FFFFFF', border: '1px solid #D1D5DB', borderRadius: 6, color: '#4B5563', fontSize: 12, cursor: 'pointer' }}>
-            <Download size={12} /> {type.replace('-', ' ')}
+            <Icon icon="mdi:download" width="12" height="12" /> {type.replace('-', ' ')}
           </button>
         ))}
       </div>
