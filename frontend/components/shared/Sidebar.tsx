@@ -3,17 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/hooks/useAuth';
-import {
-  LayoutDashboard,
-  Truck,
-  Route,
-  Users,
-  Wrench,
-  Fuel,
-  BarChart3,
-  Settings,
-  LogOut,
-} from 'lucide-react';
+import { Icon } from '@iconify/react';
 
 interface NavItem {
   label: string;
@@ -26,49 +16,49 @@ const NAV_ITEMS: NavItem[] = [
   {
     label: 'Dashboard',
     href: '/dashboard',
-    icon: <LayoutDashboard size={18} />,
+    icon: <Icon icon="mdi:view-dashboard" width="18" height="18" />,
     roles: ['FLEET_MANAGER', 'DISPATCHER', 'SAFETY_OFFICER', 'FINANCIAL_ANALYST'],
   },
   {
     label: 'Fleet',
     href: '/vehicles',
-    icon: <Truck size={18} />,
+    icon: <Icon icon="mdi:truck" width="18" height="18" />,
     roles: ['FLEET_MANAGER', 'DISPATCHER', 'SAFETY_OFFICER', 'FINANCIAL_ANALYST'],
   },
   {
     label: 'Drivers',
     href: '/drivers',
-    icon: <Users size={18} />,
+    icon: <Icon icon="mdi:account-group" width="18" height="18" />,
     roles: ['FLEET_MANAGER', 'SAFETY_OFFICER', 'DISPATCHER'],
   },
   {
     label: 'Trips',
     href: '/trips',
-    icon: <Route size={18} />,
+    icon: <Icon icon="mdi:map-marker-distance" width="18" height="18" />,
     roles: ['FLEET_MANAGER', 'DISPATCHER', 'SAFETY_OFFICER', 'FINANCIAL_ANALYST'],
   },
   {
     label: 'Maintenance',
     href: '/maintenance',
-    icon: <Wrench size={18} />,
+    icon: <Icon icon="mdi:wrench" width="18" height="18" />,
     roles: ['FLEET_MANAGER', 'SAFETY_OFFICER'],
   },
   {
     label: 'Fuel & Expenses',
     href: '/fuel-expenses',
-    icon: <Fuel size={18} />,
+    icon: <Icon icon="mdi:gas-station" width="18" height="18" />,
     roles: ['FLEET_MANAGER', 'FINANCIAL_ANALYST', 'DISPATCHER'],
   },
   {
     label: 'Analytics',
     href: '/analytics',
-    icon: <BarChart3 size={18} />,
+    icon: <Icon icon="mdi:chart-bar" width="18" height="18" />,
     roles: ['FLEET_MANAGER', 'FINANCIAL_ANALYST', 'DISPATCHER', 'SAFETY_OFFICER'],
   },
   {
     label: 'Settings',
     href: '/settings',
-    icon: <Settings size={18} />,
+    icon: <Icon icon="mdi:cog" width="18" height="18" />,
     roles: ['FLEET_MANAGER'],
   },
 ];
@@ -85,8 +75,8 @@ export function Sidebar() {
       style={{
         width: 200,
         minHeight: '100vh',
-        backgroundColor: '#0B0E14',
-        borderRight: '1px solid #1E2130',
+        backgroundColor: '#1542C2',
+        borderRight: '1px solid rgba(255,255,255,0.1)',
         display: 'flex',
         flexDirection: 'column',
         position: 'fixed',
@@ -98,8 +88,12 @@ export function Sidebar() {
       {/* Brand */}
       <div
         style={{
-          padding: '20px 20px 16px',
-          borderBottom: '1px solid #1E2130',
+          height: 60,
+          padding: '0 20px',
+          borderBottom: '1px solid rgba(255,255,255,0.1)',
+          display: 'flex',
+          alignItems: 'center',
+          flexShrink: 0,
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -108,15 +102,15 @@ export function Sidebar() {
               width: 28,
               height: 28,
               borderRadius: 6,
-              backgroundColor: '#E67E00',
+              backgroundColor: '#FFFFFF',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <Truck size={15} color="#fff" />
+            <Icon icon="mdi:truck" width="16" height="16" color="#1542C2" />
           </div>
-          <span style={{ fontSize: 16, fontWeight: 700, color: '#E5E7EB', letterSpacing: '-0.01em' }}>
+          <span style={{ fontSize: 16, fontWeight: 700, color: '#FFFFFF', letterSpacing: '-0.01em' }}>
             TransitOps
           </span>
         </div>
@@ -137,23 +131,23 @@ export function Sidebar() {
                 padding: '9px 12px',
                 borderRadius: 6,
                 fontSize: 14,
-                fontWeight: isActive ? 500 : 400,
-                color: isActive ? '#E67E00' : '#6B7280',
-                backgroundColor: isActive ? 'rgba(230,126,0,0.08)' : 'transparent',
+                fontWeight: isActive ? 600 : 400,
+                color: isActive ? '#FFFFFF' : 'rgba(255,255,255,0.75)',
+                backgroundColor: isActive ? 'rgba(255,255,255,0.15)' : 'transparent',
                 textDecoration: 'none',
                 transition: 'all 0.15s ease',
-                borderLeft: isActive ? '3px solid #E67E00' : '3px solid transparent',
+                borderLeft: isActive ? '3px solid #FFFFFF' : '3px solid transparent',
               }}
               onMouseEnter={(e) => {
                 if (!isActive) {
-                  (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(255,255,255,0.03)';
-                  (e.currentTarget as HTMLElement).style.color = '#9CA3AF';
+                  (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(255,255,255,0.08)';
+                  (e.currentTarget as HTMLElement).style.color = '#FFFFFF';
                 }
               }}
               onMouseLeave={(e) => {
                 if (!isActive) {
                   (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
-                  (e.currentTarget as HTMLElement).style.color = '#6B7280';
+                  (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.75)';
                 }
               }}
             >
@@ -165,7 +159,7 @@ export function Sidebar() {
       </nav>
 
       {/* Logout */}
-      <div style={{ padding: '12px 10px', borderTop: '1px solid #1E2130' }}>
+      <div style={{ padding: '12px 10px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
         <button
           onClick={logout}
           style={{
@@ -176,22 +170,22 @@ export function Sidebar() {
             width: '100%',
             borderRadius: 6,
             fontSize: 13,
-            color: '#6B7280',
+            color: 'rgba(255,255,255,0.75)',
             backgroundColor: 'transparent',
             border: 'none',
             cursor: 'pointer',
             transition: 'all 0.15s ease',
           }}
           onMouseEnter={(e) => {
-            (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(239,68,68,0.08)';
-            (e.currentTarget as HTMLElement).style.color = '#EF4444';
+            (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(255,255,255,0.1)';
+            (e.currentTarget as HTMLElement).style.color = '#FFFFFF';
           }}
           onMouseLeave={(e) => {
             (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
-            (e.currentTarget as HTMLElement).style.color = '#6B7280';
+            (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.75)';
           }}
         >
-          <LogOut size={18} />
+          <Icon icon="mdi:logout" width="18" height="18" />
           <span>Logout</span>
         </button>
       </div>
