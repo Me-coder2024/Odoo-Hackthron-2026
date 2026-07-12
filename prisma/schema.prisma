@@ -1,0 +1,220 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  FLEET_MANAGER
+  DISPATCHER
+  SAFETY_OFFICER
+  FINANCIAL_ANALYST
+}
+
+enum VehicleType {
+  VAN
+  TRUCK
+  BUS
+  OTHER
+}
+
+enum VehicleStatus {
+  AVAILABLE
+  ON_TRIP
+  IN_SHOP
+  RETIRED
+}
+
+enum DriverStatus {
+  AVAILABLE
+  ON_TRIP
+  OFF_DUTY
+  SUSPENDED
+}
+
+enum TripStatus {
+  DRAFT
+  DISPATCHED
+  COMPLETED
+  CANCELLED
+}
+
+enum MaintenanceStatus {
+  ACTIVE
+  CLOSED
+}
+
+enum ExpenseCategory {
+  TOLL
+  PARKING
+  REPAIR
+  OTHER
+}
+
+model User {
+  id               String           @id @default(uuid())
+  username         String           @unique
+  email            String           @unique
+  password_hash    String
+  role             UserRole
+  is_active        Boolean          @default(true)
+  created_at       DateTime         @default(now())
+  updated_at       DateTime         @updatedAt
+  trips            Trip[]
+  maintenance_logs MaintenanceLog[]
+  fuel_logs        FuelLog[]
+  expenses         Expense[]
+  audit_logs       AuditLog[]
+}
+
+model Vehicle {
+  id                  String           @id @default(uuid())
+  registration_number String           @unique
+  name                String
+  type                VehicleType
+  max_load_capacity   Decimal          @db.Decimal(10, 2)
+  odometer            Decimal          @db.Decimal(10, 2) @default(0)
+  acquisition_cost    Decimal          @db.Decimal(10, 2)
+  region              String?
+  status              VehicleStatus    @default(AVAILABLE)
+  created_at          DateTime         @default(now())
+  updated_at          DateTime         @updatedAt
+  trips               Trip[]
+  maintenance_logs    MaintenanceLog[]
+  fuel_logs           FuelLog[]
+  expenses            Expense[]
+
+  @@index([status])
+  @@index([type])
+}
+
+model Driver {
+  id               String       @id @default(uuid())
+  name             String
+  license_number   String       @unique
+  license_category String
+  license_expiry   DateTime     @db.Date
+  contact_number   String?
+  safety_score     Int          @default(100)
+  status           DriverStatus @default(AVAILABLE)
+  created_at       DateTime     @default(now())
+  updated_at       DateTime     @updatedAt
+  trips            Trip[]
+
+  @@index([status])
+  @@index([license_expiry])
+}
+
+model Trip {
+  id               String     @id @default(uuid())
+  trip_number      String     @unique
+  source           String
+  destination      String
+  vehicle_id       String
+  driver_id        String
+  cargo_weight     Decimal    @db.Decimal(10, 2)
+  planned_distance Decimal    @db.Decimal(10, 2)
+  actual_distance  Decimal?   @db.Decimal(10, 2)
+  fuel_consumed    Decimal?   @db.Decimal(10, 2)
+  final_odometer   Decimal?   @db.Decimal(10, 2)
+  revenue          Decimal?   @db.Decimal(10, 2)
+  status           TripStatus @default(DRAFT)
+  dispatched_at    DateTime?
+  completed_at     DateTime?
+  created_by       String
+  created_at       DateTime   @default(now())
+  updated_at       DateTime   @updatedAt
+  vehicle          Vehicle    @relation(fields: [vehicle_id], references: [id])
+  driver           Driver     @relation(fields: [driver_id], references: [id])
+  creator          User       @relation(fields: [created_by], references: [id])
+  fuel_logs        FuelLog[]
+  expenses         Expense[]
+
+  @@index([status])
+  @@index([vehicle_id])
+  @@index([driver_id])
+}
+
+model MaintenanceLog {
+  id           String            @id @default(uuid())
+  vehicle_id   String
+  service_type String
+  description  String?
+  status       MaintenanceStatus @default(ACTIVE)
+  started_at   DateTime          @default(now())
+  closed_at    DateTime?
+  total_cost   Decimal           @db.Decimal(10, 2) @default(0)
+  created_by   String
+  created_at   DateTime          @default(now())
+  updated_at   DateTime          @updatedAt
+  vehicle      Vehicle           @relation(fields: [vehicle_id], references: [id])
+  creator      User              @relation(fields: [created_by], references: [id])
+  items        MaintenanceItem[]
+
+  @@index([vehicle_id, status])
+}
+
+model MaintenanceItem {
+  id          String         @id @default(uuid())
+  log_id      String
+  description String
+  cost        Decimal        @db.Decimal(10, 2)
+  created_at  DateTime       @default(now())
+  log         MaintenanceLog @relation(fields: [log_id], references: [id])
+
+  @@index([log_id])
+}
+
+model FuelLog {
+  id               String   @id @default(uuid())
+  vehicle_id       String
+  trip_id          String?
+  liters           Decimal  @db.Decimal(10, 3)
+  cost_per_liter   Decimal  @db.Decimal(10, 2)
+  total_cost       Decimal  @db.Decimal(10, 2)
+  log_date         DateTime @db.Date
+  odometer_at_fill Decimal  @db.Decimal(10, 2)
+  created_by       String
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+  vehicle          Vehicle  @relation(fields: [vehicle_id], references: [id])
+  trip             Trip?    @relation(fields: [trip_id], references: [id])
+  creator          User     @relation(fields: [created_by], references: [id])
+
+  @@index([vehicle_id])
+}
+
+model Expense {
+  id           String          @id @default(uuid())
+  vehicle_id   String
+  trip_id      String?
+  category     ExpenseCategory
+  description  String?
+  amount       Decimal         @db.Decimal(10, 2)
+  expense_date DateTime        @db.Date
+  created_by   String
+  created_at   DateTime        @default(now())
+  updated_at   DateTime        @updatedAt
+  vehicle      Vehicle         @relation(fields: [vehicle_id], references: [id])
+  trip         Trip?           @relation(fields: [trip_id], references: [id])
+  creator      User            @relation(fields: [created_by], references: [id])
+
+  @@index([vehicle_id])
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  user_id    String
+  action     String
+  entity     String
+  entity_id  String
+  old_value  Json?
+  new_value  Json?
+  created_at DateTime @default(now())
+  user       User     @relation(fields: [user_id], references: [id])
+
+  @@index([entity, entity_id])
+}

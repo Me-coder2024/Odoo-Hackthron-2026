@@ -1,0 +1,34 @@
+{
+  "name": "transitops",
+  "version": "1.0.0",
+  "description": "TransitOps — Smart Transport Operations Platform",
+  "private": true,
+  "scripts": {
+    "dev:backend": "cd backend && npx ts-node-dev --respawn --transpile-only src/server.ts",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build:backend": "cd backend && npx tsc",
+    "build:frontend": "cd frontend && npm run build",
+    "prisma:migrate": "npx prisma migrate dev",
+    "prisma:generate": "npx prisma generate",
+    "prisma:seed": "npx ts-node prisma/seed.ts",
+    "prisma:studio": "npx prisma studio",
+    "prisma:reset": "npx prisma migrate reset --force"
+  },
+  "prisma": {
+    "seed": "npx ts-node prisma/seed.ts"
+  },
+  "author": "Me-coder2024",
+  "license": "MIT",
+  "main": "index.js",
+  "keywords": [],
+  "dependencies": {
+    "@prisma/client": "^6.9.0",
+    "@types/bcrypt": "^5.0.2",
+    "@types/node": "^22.15.0",
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.7",
+    "prisma": "^6.9.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  }
+}
