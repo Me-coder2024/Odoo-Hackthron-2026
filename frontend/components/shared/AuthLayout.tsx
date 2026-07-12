@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/hooks/useAuth';
 import { Sidebar } from '@/components/shared/Sidebar';
-import { Search } from 'lucide-react';
+import { Icon } from '@iconify/react';
 
 const ROLE_LABELS: Record<string, string> = {
   FLEET_MANAGER: 'Fleet Mgr',
@@ -14,7 +14,7 @@ const ROLE_LABELS: Record<string, string> = {
 };
 
 const ROLE_BADGE_COLORS: Record<string, string> = {
-  FLEET_MANAGER: '#E67E00',
+  FLEET_MANAGER: '#1542C2',
   DISPATCHER: '#3B82F6',
   SAFETY_OFFICER: '#10B981',
   FINANCIAL_ANALYST: '#8B5CF6',
@@ -88,9 +88,9 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
         {/* Top Header Bar */}
         <header
           style={{
-            height: 52,
-            backgroundColor: '#0F1219',
-            borderBottom: '1px solid #1E2130',
+            height: 60,
+            backgroundColor: '#FFFFFF',
+            borderBottom: '1px solid #E5E7EB',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -100,16 +100,16 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
         >
           {/* Search */}
           <div style={{ position: 'relative', width: 240 }}>
-            <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#4B5563' }} />
+            <Icon icon="mdi:magnify" width="14" height="14" style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
             <input
               placeholder="Search..."
               style={{
                 width: '100%',
                 padding: '7px 10px 7px 32px',
-                backgroundColor: '#1A1D26',
-                border: '1px solid #2A2D38',
+                backgroundColor: '#F3F4F6',
+                border: '1px solid #E5E7EB',
                 borderRadius: 6,
-                color: '#9CA3AF',
+                color: '#111827',
                 fontSize: 13,
                 outline: 'none',
               }}
@@ -118,7 +118,7 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
 
           {/* User info + role badge */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <span style={{ fontSize: 13, color: '#9CA3AF' }}>{displayName}</span>
+            <span style={{ fontSize: 13, color: '#4B5563' }}>{displayName}</span>
             <span
               style={{
                 padding: '4px 12px',
